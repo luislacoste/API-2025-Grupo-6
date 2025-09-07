@@ -29,7 +29,7 @@ Una aplicación de e-commerce completa desarrollada con React que permite a los 
 
 1. **Clonar el repositorio**
    ```bash
-   git clone https://github.com/Nick2611/API-2025-Grupo-6.git
+   git clone https://github.com/luislacoste/API-2025-Grupo-6
    cd API-2025-Grupo-6/tpo1
    ```
 
