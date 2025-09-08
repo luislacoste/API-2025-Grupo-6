@@ -12,6 +12,8 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import CreateListing from './pages/CreateListing';
 import MyProducts from './pages/MyProducts';
+import SearchResults from './pages/SearchResults';
+import CategoryProducts from './pages/CategoryProducts';
 import './App.css';
 
 function App() {
@@ -25,6 +27,8 @@ function App() {
               <main>
                 <Routes>
                   <Route path="/" element={<Home />} />
+                  <Route path="/search" element={<SearchResults />} />
+                  <Route path="/category/:categoryName" element={<CategoryProducts />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route 

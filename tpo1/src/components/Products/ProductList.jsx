@@ -18,6 +18,11 @@ const ProductList = ({ products, loading }) => {
     navigate(`/product/${productId}`);
   };
 
+  const handleCategoryClick = (e, categoryName) => {
+    e.stopPropagation(); // Evitar que se ejecute el click del producto
+    navigate(`/category/${encodeURIComponent(categoryName)}`);
+  };
+
   const handleAddToCart = (e, product) => {
     e.stopPropagation(); // Evitar que se ejecute el click del producto
     
@@ -71,7 +76,13 @@ const ProductList = ({ products, loading }) => {
             </div>
             
             <div className="product-info">
-              <div className="product-category">{product.category}</div>
+              <div 
+                className="product-category clickable-category"
+                onClick={(e) => handleCategoryClick(e, product.category)}
+                title={`Ver todos los productos en ${product.category}`}
+              >
+                {product.category}
+              </div>
               <h3 className="product-name">{product.name}</h3>
               <p className="product-description">{product.description}</p>
               

@@ -138,6 +138,23 @@
   margin-bottom: 8px;
 }
 
+.clickable-category {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: rgba(102, 126, 234, 0.1);
+  transition: all 0.3s ease;
+  display: inline-block;
+  border: 1px solid transparent;
+}
+
+.clickable-category:hover {
+  background: rgba(102, 126, 234, 0.2);
+  color: #5a67d8;
+  border-color: rgba(102, 126, 234, 0.3);
+  transform: translateY(-1px);
+}
+
 .product-name {
   font-size: 18px;
   font-weight: 600;

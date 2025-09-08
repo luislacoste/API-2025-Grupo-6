@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProducts } from '../context/ProductContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ProductList from '../components/Products/ProductList';
 import CategoryList from '../components/Categories/CategoryList';
 import './Home.css';
@@ -9,10 +9,11 @@ import './Home.css';
 const Home = () => {
   const { user } = useAuth();
   const { products, categories, loading } = useProducts();
+  const navigate = useNavigate();
 
   const handleCategoryClick = (category) => {
-    // TODO: Implementar navegación a productos por categoría
-    console.log('Categoría seleccionada:', category.name);
+    // Navegar a la página de productos por categoría
+    navigate(`/category/${encodeURIComponent(category.name)}`);
   };
 
   return (
