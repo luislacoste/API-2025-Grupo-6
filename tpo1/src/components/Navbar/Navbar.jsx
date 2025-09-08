@@ -124,8 +124,6 @@ const Navbar = () => {
         </div>
         
         <div className="navbar-menu">
-          <Link to="/" className="navbar-link">Inicio</Link>
-          
           {user ? (
             <div className="navbar-user">
               <Link to="/create-listing" className="sell-button">
