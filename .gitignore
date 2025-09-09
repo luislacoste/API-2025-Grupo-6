@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 
 # Ignore DS Store files
 .DS_Store
+
+# Ignore ignore folder
+ignore/
