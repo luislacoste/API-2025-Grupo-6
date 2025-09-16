@@ -184,15 +184,188 @@ const CreateListing = () => {
 
       {/* Formulario principal */}
       <form onSubmit={handleSubmit} className="create-listing-form">
-        {/* Sección de información básica (nombre, precio, stock) */}
-        ...
-        {/* Sección de categoría */}
-        ...
-        {/* Sección de descripción */}
-        ...
-        {/* Sección de imágenes */}
-        ...
-        {/* Botones de acción (cancelar y publicar) */}
+        {/* Información básica */}
+        <div className="form-section">
+          <h2>Información del Producto</h2>
+
+          <div className="form-group">
+            <label htmlFor="name">Nombre del Producto *</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder="Ej: iPhone 15 Pro Max 256GB"
+              className={errors.name ? 'error' : ''}
+            />
+            {errors.name && <span className="error-message">{errors.name}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="price">Precio (ARS) *</label>
+            <input
+              type="number"
+              id="price"
+              name="price"
+              value={formData.price}
+              onChange={handleInputChange}
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+              className={errors.price ? 'error' : ''}
+            />
+            {errors.price && <span className="error-message">{errors.price}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="stock">Stock Disponible *</label>
+            <input
+              type="number"
+              id="stock"
+              name="stock"
+              value={formData.stock}
+              onChange={handleInputChange}
+              min="0"
+              className={errors.stock ? 'error' : ''}
+            />
+            {errors.stock && <span className="error-message">{errors.stock}</span>}
+          </div>
+        </div>
+
+        {/* Categoría */}
+        <div className="form-section">
+          <h2>Categoría</h2>
+
+          <div className="form-group">
+            <label htmlFor="category">Categoría del Producto *</label>
+            <select
+              id="category"
+              onChange={handleCategoryChange}
+              value={showNewCategory ? 'nueva' : formData.category}
+              className={errors.category ? 'error' : ''}
+            >
+              <option value="">Selecciona una categoría</option>
+              {categories.map(category => (
+                <option key={category.id} value={category.name}>
+                  {category.name}
+                </option>
+              ))}
+              <option value="nueva">+ Crear nueva categoría</option>
+            </select>
+            {errors.category && <span className="error-message">{errors.category}</span>}
+          </div>
+
+          {showNewCategory && (
+            <div className="form-group">
+              <label htmlFor="newCategory">Nueva Categoría</label>
+              <input
+                type="text"
+                id="newCategory"
+                name="newCategory"
+                value={formData.newCategory}
+                onChange={handleInputChange}
+                placeholder="Nombre de la nueva categoría"
+                className={errors.category ? 'error' : ''}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Descripción */}
+        <div className="form-section">
+          <h2>Descripción</h2>
+
+          <div className="form-group">
+            <label htmlFor="description">Descripción del Producto *</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Describe tu producto en detalle, incluye características, estado, etc."
+              rows="5"
+              className={errors.description ? 'error' : ''}
+            />
+            <div className="char-count">
+              {formData.description.length} caracteres (mínimo 20)
+            </div>
+            {errors.description && <span className="error-message">{errors.description}</span>}
+          </div>
+        </div>
+
+        {/* Imágenes */}
+        <div className="form-section">
+          <h2>Fotos del Producto</h2>
+
+          <div className="form-group">
+            <label htmlFor="images">Imágenes *</label>
+            <div className="image-upload-area">
+              <input
+                type="file"
+                id="images"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="images" className="upload-button">
+                <span>📷</span>
+                Agregar Fotos
+              </label>
+              <p className="upload-help">
+                Sube hasta 5 imágenes (JPG, PNG, WEBP - máx. 5MB cada una)
+              </p>
+            </div>
+            {errors.images && <span className="error-message">{errors.images}</span>}
+
+            {/* Previsualización de imágenes */}
+            {imagePreviews.length > 0 && (
+              <div className="image-previews">
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} className="image-preview">
+                    <img src={preview.url} alt={`Preview ${index + 1}`} />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="remove-image"
+                    >
+                      ✕
+                    </button>
+                    {index === 0 && (
+                      <span className="main-image-badge">Principal</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Error general */}
+        {errors.submit && (
+          <div className="error-message submit-error">
+            {errors.submit}
+          </div>
+        )}
+
+        {/* Botones */}
+        <div className="form-actions">
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="cancel-button"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="submit-button"
+          >
+            {loading ? 'Publicando...' : 'Publicar Producto'}
+          </button>
+        </div>
       </form>
     </div>
   );
