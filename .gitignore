@@ -144,3 +144,7 @@ vite.config.ts.timestamp-*
 
 # Ignore ignore folder
 ignore/
+
+
+# ignore DB JSON file
+db.json

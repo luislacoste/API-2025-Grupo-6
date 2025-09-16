@@ -159,11 +159,11 @@ const CreateListing = () => {
       };
 
       // Guardamos el producto usando la función del contexto
-      const result = createProductListing(productData);
+      const result = await createProductListing(productData);
 
       if (result.success) {
         alert('¡Producto publicado exitosamente!');
-        navigate('/'); // Redirige al home
+        navigate('/my-products'); // Redirige a mis productos
       } else {
         setErrors({ submit: result.error });
       }

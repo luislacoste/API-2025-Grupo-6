@@ -17,9 +17,15 @@ const MyProducts = () => {
   const [loading, setLoading] = useState(false);
 
   // Filtrar productos del usuario actual
-  const myProducts = products.filter(product => 
-    product.createdBy === user?.id || product.createdBy === 'usuario'
-  );
+  const myProducts = products.filter(product => {
+    if (!user?.id) return false; // Si no hay usuario logueado, no mostrar productos
+    
+    // Verificar tanto userId como createdBy para compatibilidad
+    return product.userId === user.id || 
+           product.createdBy === user.id ||
+           product.userId === user?.id || 
+           product.createdBy === user?.id;
+  });
 
   // Formatear precio
   const formatPrice = (price) => {
@@ -56,7 +62,7 @@ const MyProducts = () => {
 
     setLoading(true);
     try {
-      const result = deleteProduct(selectedProduct.id);
+      const result = await deleteProduct(selectedProduct.id);
       
       if (result.success) {
         alert('Producto eliminado exitosamente');
@@ -98,7 +104,7 @@ const MyProducts = () => {
         newStock = quantity; // set exact amount
       }
 
-      const result = updateProductStock(selectedProduct.id, newStock);
+      const result = await updateProductStock(selectedProduct.id, newStock);
       
       if (result.success) {
         alert(`Stock actualizado exitosamente. Nuevo stock: ${newStock}`);
@@ -117,6 +123,26 @@ const MyProducts = () => {
   const goToCreateProduct = () => {
     navigate('/create-listing');
   };
+
+  // Si no hay usuario logueado, redirigir al login
+  if (!user) {
+    return (
+      <div className="my-products-container">
+        <div className="my-products-header">
+          <h1>Mis Productos</h1>
+        </div>
+        
+        <div className="empty-state">
+          <div className="empty-icon">🔒</div>
+          <h2>Inicia sesión para ver tus productos</h2>
+          <p>Necesitas estar logueado para gestionar tus publicaciones</p>
+          <button onClick={() => navigate('/auth')} className="create-first-product-btn">
+            Iniciar Sesión
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (myProducts.length === 0) {
     return (
