@@ -148,3 +148,4 @@ ignore/
 
 # ignore DB JSON file
 db.json
+tpo1/db.json

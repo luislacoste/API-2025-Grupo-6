@@ -174,7 +174,7 @@ export const CartProvider = ({ children }) => {
   };
 
   // Simular proceso de compra con descuento de stock
-  const checkout = () => {
+  const checkout = async () => {
     try {
       if (cartItems.length === 0) {
         return { success: false, error: 'El carrito está vacío' };
@@ -205,16 +205,19 @@ export const CartProvider = ({ children }) => {
         });
       }
 
-      // Aplicar descuentos de stock
+      // Aplicar descuentos de stock (ahora con await)
       let stockUpdateSuccess = true;
       for (const update of stockUpdates) {
-        const result = updateProductStock(update.productId, update.newStock);
+        const result = await updateProductStock(update.productId, update.newStock);
+        console.log('Resultado actualización stock:', result);
         if (!result.success) {
           stockUpdateSuccess = false;
+          console.error('Error actualizando stock:', result.error);
           break;
         }
       }
-
+      
+      console.log('Resultados de la actualización de stock:', stockUpdates);
       if (!stockUpdateSuccess) {
         return { 
           success: false, 
@@ -236,6 +239,7 @@ export const CartProvider = ({ children }) => {
         }
       };
     } catch (error) {
+      console.error('Error en checkout:', error);
       return { success: false, error: error.message };
     }
   };

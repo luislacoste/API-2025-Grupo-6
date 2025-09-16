@@ -57,7 +57,7 @@ const Cart = () => {
       return;
     }
 
-    const result = checkout();
+    const result = await checkout();
     
     if (result.success) {
       alert(`¡Compra realizada con éxito! 🎉\n\nTotal: ${formatPrice(result.order.total)}\nStock actualizado automáticamente.`);

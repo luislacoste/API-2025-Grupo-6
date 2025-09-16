@@ -147,7 +147,7 @@ export const updateProductStock = async (id, newStock) => {
       ...currentProduct,
       stock: newStock
     });
-    
+    console.log('Stock actualizado:', updatedProduct);
     return updatedProduct;
   } catch (error) {
     throw new Error(`Error al actualizar stock: ${error.message}`);
