@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
@@ -7,15 +7,51 @@ import './ProductDetail.css';
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { products } = useProducts();
+  const { products, getProductByIdAsync, loading: globalLoading } = useProducts();
   const { addToCart } = useCart();
   
   // Estado para la imagen seleccionada
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  // Estados locales para producto, loading y error
+  const [localLoading, setLocalLoading] = useState(true);
+  const [product, setProduct] = useState(null);
+  const [loadError, setLoadError] = useState(null);
 
-  // Buscar el producto por ID
-  const product = products.find(p => p.id === parseInt(id));
+  useEffect(() => {
+    let isMounted = true;
+    const cargar = async () => {
+      setLocalLoading(true);
+      setLoadError(null);
+      const { product: found, error } = await getProductByIdAsync(id);
+      if (!isMounted) return;
+      if (error) {
+        setLoadError(error);
+      }
+      setProduct(found || null);
+      setLocalLoading(false);
+    };
+    cargar();
+    return () => { isMounted = false; };
+  }, [id, getProductByIdAsync]);
 
+  if (localLoading || globalLoading) {
+    return <div className="product-detail-container"><p>Cargando producto...</p></div>;
+  }
+
+  if (loadError) {
+    return (
+      <div className="product-detail-container">
+        <div className="error-state">
+          <div className="error-icon">❌</div>
+          <h2>Error al cargar el producto</h2>
+          <p>{loadError}</p>
+          <button onClick={() => navigate('/')} className="back-button">Volver al inicio</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Buscar el producto por ID (ya seteado en estado)
   if (!product) {
     return (
       <div className="product-detail-container">

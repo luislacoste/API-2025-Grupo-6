@@ -1,174 +1,120 @@
 # 🛒 E-Commerce React App - Grupo 6
 
-Una aplicación de e-commerce completa desarrollada con React que permite a los usuarios comprar y vender productos online con funcionalidades avanzadas de búsqueda y navegación.
-
-## ✨ Características
-
-### 🔐 **Autenticación y Usuarios**
-- **Registro e inicio de sesión** - Sistema completo de autenticación
-- **Persistencia de sesión** - Mantiene la sesión activa con localStorage
-- **Rutas protegidas** - Acceso controlado a funcionalidades premium
-
-### 🛍️ **Catálogo y Navegación**
-- **Listado de productos** - Visualización ordenada alfabéticamente
-- **Navegación por categorías** - Exploración intuitiva por tipo de producto
-- **Buscador inteligente** - Búsqueda en tiempo real con sugerencias
-- **Páginas de detalle** - Vista completa con galería de imágenes múltiples
-- **Filtros avanzados** - Por precio, categoría y disponibilidad
-
-### 🛒 **Carrito de Compras Avanzado**
-- **Gestión completa** - Agregar, quitar y modificar cantidades
-- **Validación de stock en tiempo real** - Control automático de disponibilidad
-- **Descuento automático** - Actualización de inventario al finalizar compra
-- **Alertas visuales** - Notificaciones para problemas de stock
-- **Persistencia** - Carrito guardado entre sesiones
-
-### 📝 **Gestión de Productos**
-- **Publicación de productos** - Formulario completo para vendedores
-- **Múltiples imágenes** - Subida de hasta 5 fotos por producto
-- **Gestión de categorías** - Selección existente o creación nueva
-- **Validaciones exhaustivas** - Control de datos y formatos
-- **Vista "Mis Productos"** - Panel de control personal
-
-### 🔧 **Administración de Inventario**
-- **Control de stock** - Agregar, quitar o establecer cantidades exactas
-- **Eliminación de productos** - Gestión completa del catálogo personal
-- **Actualizaciones en tiempo real** - Sincronización instantánea
-- **Interfaz moderna** - Modales y confirmaciones intuitivas
-
-### 🔍 **Búsqueda y Filtros**
-- **Buscador global** - Disponible en toda la aplicación
-- **Búsqueda predictiva** - Sugerencias mientras escribes
-- **Resultados categorizados** - Organización inteligente
-- **Filtros por precio** - Rangos personalizables
-- **Ordenamiento múltiple** - Por relevancia, precio, nombre
-
-### 📱 **Experiencia de Usuario**
-- **Diseño responsivo** - Adaptado a todos los dispositivos
-- **Navegación intuitiva** - Breadcrumbs y navegación clara
-- **Estados informativos** - Mensajes para situaciones vacías
-- **Animaciones suaves** - Transiciones y efectos modernos
+Aplicación de e-commerce desarrollada con React (Vite) que permite a los usuarios registrarse, explorar productos por categorías, ver detalles, agregar al carrito y gestionar su sesión. Ahora los productos y categorías se obtienen dinámicamente desde `json-server` utilizando el archivo `db.json`, eliminando los arrays hardcodeados del contexto.
 
 ## 🚀 Tecnologías
+- React 19 + Hooks (useState, useEffect, useContext)
+- React Router DOM 7
+- Context API (Auth, Products, Cart)
+- Vite 7 (dev server / build)
+- json-server (mock API REST)
+- CSS moderno (Flexbox / Grid)
 
-- **React 19.1.1** - Framework principal con hooks modernos
-- **React Router DOM** - Navegación SPA avanzada
-- **Vite 7.1.2** - Build tool y servidor de desarrollo rápido
-- **CSS3 Moderno** - Grid, Flexbox, animaciones y responsive design
-- **Context API** - Gestión de estado global sin librerías externas
-- **localStorage** - Persistencia de datos local
-
-## 📋 Prerequisitos
-
-- Node.js (versión 16 o superior)
-- npm o yarn
-- Navegador moderno con soporte ES6+
-
-## 🔧 Instalación y Configuración
-
-1. **Clonar el repositorio**
-   ```bash
-   git clone https://github.com/luislacoste/API-2025-Grupo-6.git
-   cd API-2025-Grupo-6/tpo1
-   ```
-
-2. **Instalar dependencias**
-   ```bash
-   npm install
-   ```
-
-3. **Iniciar la aplicación**
-   ```bash
-   npm run dev
-   ```
-
-4. **Abrir en el navegador**
-   - La aplicación estará disponible en `http://localhost:5173`
-
-## 👤 Cómo Usar la Aplicación
-
-### **Para Compradores:**
-1. **Registrarse/Iniciar sesión** - Crear cuenta o acceder
-2. **Explorar catálogo** - Navegar por productos y categorías
-3. **Buscar productos** - Usar el buscador global
-4. **Ver detalles** - Revisar fotos y especificaciones
-5. **Gestionar carrito** - Agregar productos y revisar stock
-6. **Finalizar compra** - Proceso automatizado con validaciones
-
-### **Para Vendedores:**
-1. **Crear productos** - Usar el botón "Vender" en la navbar
-2. **Subir imágenes** - Hasta 5 fotos por producto
-3. **Gestionar inventario** - Desde "Mis Productos"
-4. **Controlar stock** - Agregar/quitar/establecer cantidades
-5. **Eliminar productos** - Gestión completa del catálogo
-
-### **Navegación Avanzada:**
-- **Búsqueda global** - Barra superior siempre disponible
-- **Filtros por categoría** - Click en cualquier categoría
-- **Navegación por breadcrumbs** - Ubicación clara
-- **Enlaces directos** - URLs amigables y compartibles
-
-## 📁 Estructura del Proyecto
-
+## 📂 Estructura Relevante
 ```
-src/
-├── components/              # Componentes reutilizables
-│   ├── Auth/               # Login y Register
-│   ├── Navbar/             # Navegación con buscador
-│   ├── Products/           # Lista y tarjetas de productos
-│   ├── Categories/         # Lista de categorías
-│   └── ProtectedRoute.jsx  # Protección de rutas
-├── context/                # Context API para estado global
-│   ├── AuthContext.jsx     # Autenticación de usuarios
-│   ├── ProductContext.jsx  # Gestión de productos
-│   └── CartContext.jsx     # Carrito de compras
-├── pages/                  # Páginas principales
-│   ├── Home.jsx           # Página principal
-│   ├── ProductDetail.jsx  # Detalle de producto
-│   ├── Cart.jsx           # Carrito de compras
-│   ├── CreateListing.jsx  # Crear producto
-│   ├── MyProducts.jsx     # Gestión de productos
-│   ├── SearchResults.jsx  # Resultados de búsqueda
-│   └── CategoryProducts.jsx # Productos por categoría
-└── assets/                # Recursos estáticos
+tpo1/
+├── db.json                # Fuente de datos para json-server
+├── package.json           # Scripts y dependencias
+└── src/
+    ├── services/
+    │   └── api.js        # Helpers de fetch (products, categories, product by id)
+    ├── context/
+    │   ├── ProductContext.jsx  # Carga inicial desde API + helpers
+    │   ├── AuthContext.jsx     # Registro / login (localStorage)
+    │   └── CartContext.jsx     # Carrito (persistencia local)
+    ├── components/      # UI reutilizable (Products, Categories, Navbar, etc.)
+    └── pages/           # Vistas: Home, ProductDetail, Cart, etc.
 ```
 
-## 🌐 Rutas de la Aplicación
+## 🔄 Cambio Importante (Refactor ProductContext)
+Antes: `ProductContext.jsx` contenía arrays `initialProducts` e `initialCategories`, además de lógica con `localStorage`.
 
-- `/` - Página principal con productos destacados
-- `/search?q=término` - Resultados de búsqueda
-- `/category/:categoryName` - Productos por categoría
-- `/product/:id` - Detalle de producto específico
-- `/cart` - Carrito de compras (protegida)
-- `/create-listing` - Crear nuevo producto (protegida)
-- `/my-products` - Gestionar mis productos (protegida)
-- `/login` - Iniciar sesión
-- `/register` - Crear cuenta
+Ahora:
+- Usa `useEffect` con array de dependencias `[]` para hacer una sola carga inicial.
+- Llama a helpers de `src/services/api.js` (`fetchProducts`, `fetchCategories`).
+- Ordena productos alfabéticamente en memoria.
+- Calcula `productCount` por categoría dinámicamente.
+- Expone `getProductByIdAsync` que, si no encuentra el producto en cache, lo busca en el servidor.
+- Incluye stubs para futuras operaciones (crear, eliminar, actualizar stock) que se implementarán cuando se activen métodos POST/PUT/DELETE sobre json-server.
 
-## 🎯 Funcionalidades Destacadas
+## 📋 Prerrequisitos
+- Node.js >= 16
+- npm (incluido con Node)
 
-### **Búsqueda Inteligente**
-- Búsqueda en tiempo real mientras escribes
-- Sugerencias con imágenes y precios
-- Búsqueda por nombre, descripción y categoría
-- Navegación directa desde sugerencias
+## ⚙️ Instalación
+```bash
+# 1. Clonar el repo
+git clone https://github.com/luislacoste/API-2025-Grupo-6.git
+cd API-2025-Grupo-6/tpo1
 
-### **Gestión de Stock Automática**
-- Validación en tiempo real antes de agregar al carrito
-- Descuento automático al finalizar compra
-- Alertas visuales para productos sin stock
-- Sincronización entre todos los contextos
+# 2. Instalar dependencias
+npm install
+```
 
-### **Navegación por Categorías**
-- Click en cualquier categoría para ver productos
-- Filtros avanzados por precio y ordenamiento
-- Breadcrumbs para navegación clara
-- Sugerencias de categorías relacionadas
+## ▶️ Ejecución en Desarrollo
+En dos terminales (o usando un proceso en background):
+
+```bash
+# Terminal 1: iniciar API mock
+npm run json-server
+# Servirá endpoints:
+#  - http://localhost:3000/products
+#  - http://localhost:3000/categories
+
+# Terminal 2: iniciar React (alias también disponible: npm start)
+npm run dev
+# o
+npm start
+```
+Abrir: http://localhost:5173
+
+## 🧪 Verificar Funcionamiento del Detalle de Producto
+1. Levantar json-server (debe mostrar endpoints en consola).
+2. Abrir la app y hacer clic sobre cualquier tarjeta de producto.
+3. Debe navegar a `/product/:id` y mostrar:
+   - Imagen principal (y galería si existieran múltiples imágenes en el dato).
+   - Nombre, precio formateado, descripción, stock y fecha.
+4. Si el producto NO existe (por ejemplo `/product/9999`): muestra mensaje “Producto no encontrado”.
+5. Si hay un error real de red / servidor: muestra mensaje “Error al cargar el producto” + detalle.
+
+## 📦 Scripts Disponibles
+| Comando                | Descripción |
+|------------------------|-------------|
+| `npm run dev` / `npm start` | Inicia servidor de desarrollo Vite (React) |
+| `npm run json-server`  | Inicia API mock leyendo `db.json` en puerto 3000 |
+| `npm run build`        | Build de producción |
+| `npm run preview`      | Previsualiza build |
+| `npm run lint`         | Ejecuta ESLint |
+
+## 🛠️ Helpers Principales (`services/api.js`)
+```js
+fetchProducts();          // GET /products
+fetchCategories();        // GET /categories
+fetchProductById(id);     // GET /products/:id
+fetchProductsByCategory(name); // GET /products?category=...
+```
+Todos siguen el patrón: `fetch -> verificar response.ok -> .json() -> try/catch/throw`. Estilo alineado al ejemplo de clase (`UseEffectExample.jsx`).
+
+## 🧠 Contextos Clave
+- `ProductContext`: datos de productos/categorías y utilidades (búsqueda, filtrado, getProductByIdAsync).
+- `AuthContext`: registro/login con persistencia básica en `localStorage` (prototipo académico).
+- `CartContext`: manejo de items, validación de stock y persistencia local.
+
+## 🔒 Limitaciones Actuales / Próximos Pasos
+- Aún no se implementan operaciones POST/PUT/DELETE reales sobre json-server (crear/editar/eliminar producto, modificar stock).
+- Las funciones `createProductListing`, `updateProductStock` y `deleteProduct` son stubs y mostrarán avisos en consola.
+- Próxima etapa: integrar mutaciones y sincronización contra API.
+
+## ❓ Troubleshooting
+| Problema | Causa Común | Solución |
+|----------|-------------|----------|
+| Productos no cargan | json-server no iniciado | Ejecutar `npm run json-server` antes que React |
+| Error CORS | Puerto incorrecto o server caído | Verificar que endpoints respondan en navegador |
+| Detalle muestra “Producto no encontrado” | ID inexistente | Confirmar que el ID está en `db.json` |
+| “Error al cargar el producto” | JSON inválido o server caído | Revisar consola de json-server |
 
 ## 👥 Equipo
-
-Proyecto desarrollado para la materia **API 2025 - Grupo 6**
+Proyecto desarrollado para la materia **API 2025 - Grupo 6**.
 
 ---
-
-**¡Una experiencia de e-commerce completa y moderna! 🎉**
+**¡Listo! La app ahora consume datos reales desde json-server y el detalle de producto funciona correctamente.** 🎉

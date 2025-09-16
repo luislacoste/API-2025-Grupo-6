@@ -1,0 +1,128 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Auriculares Bluetooth Sony",
+      "price": 89999,
+      "category": "Electrónicos",
+      "description": "Auriculares inalámbricos con cancelación de ruido",
+      "image": "https://picsum.photos/seed/auriculares/300/300",
+      "stock": 15,
+      "createdAt": "2025-01-05T10:15:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Camiseta Deportiva Nike",
+      "price": 25999,
+      "category": "Ropa",
+      "description": "Camiseta deportiva de alta calidad para entrenar",
+      "image": "https://picsum.photos/id/358/800/600",
+      "stock": 30,
+      "createdAt": "2025-01-08T14:30:00.000Z"
+    },
+    {
+      "id": 3,
+      "name": "Libro: JavaScript Avanzado",
+      "price": 15999,
+      "category": "Libros",
+      "description": "Guía completa para dominar JavaScript moderno",
+      "image": "https://picsum.photos/id/250/800/600",
+      "stock": 8,
+      "createdAt": "2025-01-12T09:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "name": "Botella de Agua Deportiva",
+      "price": 8999,
+      "category": "Deportes",
+      "description": "Botella térmica de acero inoxidable 750ml",
+      "image": "https://picsum.photos/id/325/800/600",
+      "stock": 25,
+      "createdAt": "2025-01-15T16:45:00.000Z"
+    },
+    {
+      "id": 5,
+      "name": "Mouse Gaming Logitech",
+      "price": 45999,
+      "category": "Electrónicos",
+      "description": "Mouse gaming con sensor de alta precisión",
+      "image": "https://picsum.photos/id/146/800/600",
+      "stock": 12,
+      "createdAt": "2025-01-18T11:20:00.000Z"
+    },
+    {
+      "id": 6,
+      "name": "Zapatillas Running Adidas",
+      "price": 79999,
+      "category": "Deportes",
+      "description": "Zapatillas para running con tecnología Boost",
+      "image": "https://picsum.photos/id/300/800/600",
+      "stock": 18,
+      "createdAt": "2025-01-20T13:10:00.000Z"
+    },
+    {
+      "id": 7,
+      "name": "Crema Hidratante Facial",
+      "price": 12999,
+      "category": "Belleza",
+      "description": "Crema hidratante con ácido hialurónico",
+      "image": "https://picsum.photos/id/450/800/600",
+      "stock": 20,
+      "createdAt": "2025-01-25T08:05:00.000Z"
+    },
+    {
+      "id": 8,
+      "name": "Mochila para Laptop",
+      "price": 35999,
+      "category": "Accesorios",
+      "description": "Mochila resistente al agua para laptop hasta 15.6\"",
+      "image": "https://picsum.photos/id/201/800/600",
+      "stock": 10,
+      "createdAt": "2025-01-28T17:55:00.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Electrónicos",
+      "description": "Dispositivos y gadgets tecnológicos",
+      "icon": "📱",
+      "productCount": 0
+    },
+    {
+      "id": 2,
+      "name": "Ropa",
+      "description": "Vestimenta para todas las ocasiones",
+      "icon": "👕",
+      "productCount": 0
+    },
+    {
+      "id": 3,
+      "name": "Deportes",
+      "description": "Artículos deportivos y de fitness",
+      "icon": "⚽",
+      "productCount": 0
+    },
+    {
+      "id": 4,
+      "name": "Libros",
+      "description": "Literatura y libros educativos",
+      "icon": "📚",
+      "productCount": 0
+    },
+    {
+      "id": 5,
+      "name": "Belleza",
+      "description": "Productos de cuidado personal",
+      "icon": "💄",
+      "productCount": 0
+    },
+    {
+      "id": 6,
+      "name": "Accesorios",
+      "description": "Complementos y accesorios diversos",
+      "icon": "🎒",
+      "productCount": 0
+    }
+  ]
+}

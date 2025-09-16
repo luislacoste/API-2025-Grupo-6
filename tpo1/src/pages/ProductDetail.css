@@ -117,10 +117,12 @@
 
 .stock-badge.in-stock {
   background: #10b981;
+  color: black;
 }
 
 .stock-badge.out-of-stock {
   background: #ef4444;
+  color: black;
 }
 
 /* Sección de información */
