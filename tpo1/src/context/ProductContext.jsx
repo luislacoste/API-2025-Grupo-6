@@ -113,6 +113,30 @@ export const ProductProvider = ({ children }) => {
     cargarDatos();
   };
 
+  const ensureDataLoaded = async () => {
+    if (!loading && products.length === 0) {
+      try {
+        setLoading(true);
+        const productosData = await fetchProducts();
+        const categoriasData = await fetchCategories();
+        const productosOrdenados = productosData.sort((a,b)=>a.name.localeCompare(b.name));
+        const categoriasConContador = categoriasData.map(c => ({
+          ...c,
+          productCount: productosData.filter(p => p.category === c.name).length
+        }));
+        setProducts(productosOrdenados);
+        setCategories(categoriasConContador);
+      } catch (err) {
+        console.error('Reintento fallido de carga de datos:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const isDataReady = !loading && products.length > 0;
+
   // Función para filtrar productos por categoría
   const getProductsByCategory = (categoryName) => {
     return products.filter(product => product.category === categoryName);
@@ -121,6 +145,19 @@ export const ProductProvider = ({ children }) => {
   // Función para obtener un producto por ID
   const getProductById = (id) => {
     return products.find(product => product.id === parseInt(id));
+  };
+
+  // Versión asíncrona: si no está en memoria intenta traerlo del servidor
+  const getProductByIdAsync = async (id) => {
+    const local = getProductById(id);
+    if (local) return { product: local, from: 'cache' };
+    try {
+      const { fetchProductById } = await import('../services/api');
+      const remote = await fetchProductById(id);
+      return { product: remote, from: 'server' };
+    } catch (err) {
+      return { product: null, error: err.message };
+    }
   };
 
   // Función para buscar productos por nombre
@@ -173,12 +210,15 @@ export const ProductProvider = ({ children }) => {
     recargarDatos,
     getProductsByCategory,
     getProductById,
+    getProductByIdAsync,
     searchProducts,
     
     // Funciones temporales para compatibilidad
     updateProductStock,
     createProductListing,
-    deleteProduct
+    deleteProduct,
+    ensureDataLoaded,
+    isDataReady
   };
 
   return (

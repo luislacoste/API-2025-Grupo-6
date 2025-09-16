@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProducts } from '../context/ProductContext';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,13 +8,17 @@ import './Home.css';
 
 const Home = () => {
   const { user } = useAuth();
-  const { products, categories, loading } = useProducts();
+  const { products, categories, loading, ensureDataLoaded } = useProducts();
   const navigate = useNavigate();
 
   const handleCategoryClick = (category) => {
     // Navegar a la página de productos por categoría
     navigate(`/category/${encodeURIComponent(category.name)}`);
   };
+
+  useEffect(() => {
+    ensureDataLoaded();
+  }, [ensureDataLoaded]);
 
   return (
     <div className="home-container">

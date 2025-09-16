@@ -8,7 +8,7 @@ import './Navbar.css';
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { getTotalItems } = useCart();
-  const { products } = useProducts();
+  const { products, ensureDataLoaded } = useProducts();
   const navigate = useNavigate();
   
   // Estados para el buscador
@@ -24,11 +24,15 @@ const Navbar = () => {
   // Función para buscar productos
   const handleSearch = (query) => {
     setSearchQuery(query);
-    
+
     if (query.trim() === '') {
       setSearchResults([]);
       setShowSearchResults(false);
       return;
+    }
+
+    if (products.length === 0) {
+      ensureDataLoaded();
     }
 
     // Filtrar productos que contengan el término de búsqueda
@@ -83,7 +87,7 @@ const Navbar = () => {
                 placeholder="Buscar productos..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
+                onFocus={() => { ensureDataLoaded(); if (searchResults.length > 0) setShowSearchResults(true); }}
                 onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                 className="search-input"
               />
