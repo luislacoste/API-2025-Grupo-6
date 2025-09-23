@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useProducts } from './ProductContext';
 
 const CartContext = createContext();
+// Custom hook para usar el contexto del carrito
 
 export const useCart = () => {
   const context = useContext(CartContext);
