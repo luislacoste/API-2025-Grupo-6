@@ -14,6 +14,19 @@ const ProductList = ({ products, loading }) => {
     }).format(price / 100);
   };
 
+  const getProductImage = (product) => {
+    // Check if product has images array (multiple images)
+    if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+      return product.images[0]; // Return first image as thumbnail
+    }
+    // Fallback to single image property
+    if (product.image) {
+      return product.image;
+    }
+    // Fallback to placeholder if no image is available
+    return 'https://via.placeholder.com/300x200/f0f0f0/666?text=Sin+imagen';
+  };
+
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
   };
@@ -64,7 +77,7 @@ const ProductList = ({ products, loading }) => {
             onClick={() => handleProductClick(product.id)}
           >
             <div className="product-image">
-              <img src={product.image} alt={product.name} />
+              <img src={getProductImage(product)} alt={product.name} />
               <div className="product-badge">
                 <span className={`stock-badge ${product.stock === 0 ? 'out-of-stock' : ''}`}>
                   {product.stock === 0 ? 'Sin stock' : `Stock: ${product.stock}`}
