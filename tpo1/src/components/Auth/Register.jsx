@@ -17,6 +17,7 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  // Control de inputs y limpieza de errores campo a campo
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -32,6 +33,7 @@ const Register = () => {
     }
   };
 
+  // Validaciones de registro: username, email, contraseña y datos personales
   const validateForm = () => {
     const newErrors = {};
 
@@ -78,6 +80,7 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Envío: valida, crea usuario vía contexto y redirige al home si fue exitoso
   const handleSubmit = async (e) => {
     e.preventDefault();
     

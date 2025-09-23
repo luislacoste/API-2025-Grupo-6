@@ -13,6 +13,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  // Control de inputs y limpieza de errores campo a campo
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -28,6 +29,7 @@ const Login = () => {
     }
   };
 
+  // Validación mínima de formulario (formato email y presencia de password)
   const validateForm = () => {
     const newErrors = {};
 
@@ -48,6 +50,7 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Envío: valida, muestra loading, intenta login y navega al home si fue exitoso
   const handleSubmit = async (e) => {
     e.preventDefault();
     

@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Cargar usuario desde localStorage al iniciar
+  // Carga inicial: intenta restaurar sesión desde localStorage
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // Función para registrar usuario
+  // Registro: valida duplicados y persiste en localStorage; inicia sesión automáticamente
   const register = (userData) => {
     try {
       // Obtener usuarios existentes
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       const updatedUsers = [...existingUsers, newUser];
       localStorage.setItem('users', JSON.stringify(updatedUsers));
 
-      // Establecer como usuario actual
+      // Establecer sesión actual (payload mínimo para UI)
       const userSession = { 
         id: newUser.id, 
         username: newUser.username, 
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Función para iniciar sesión
+  // Login: busca coincidencia exacta email+password en localStorage y guarda sesión
   const login = (email, password) => {
     try {
       const users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Función para cerrar sesión
+  // Logout: limpia la sesión actual
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
