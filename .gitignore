@@ -154,3 +154,5 @@ tpo1/db.json
 .idea/inspectionProfiles/Project_Default.xml
 
 .vscode/*
+
+/tpo1/spring-backend/target/
