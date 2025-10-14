@@ -111,7 +111,6 @@
               <include>**/*.sql</include>
               <include>**/*.properties</include>
             </includes>
-            <encoding>UTF-8</encoding>
           </resource>
         </resources>
       </build>
