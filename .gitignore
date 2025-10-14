@@ -149,3 +149,8 @@ ignore/
 # ignore DB JSON file
 db.json
 tpo1/db.json
+.idea/*
+.idea/IntelliLang.xml
+.idea/inspectionProfiles/Project_Default.xml
+
+.vscode/*
