@@ -14,6 +14,8 @@ Aplicación de e-commerce full-stack desarrollada con React (Vite) como frontend
 ### Backend
 - Spring Boot 3.1.4
 - Spring Data JPA
+- Spring Security
+- Lombok
 - MySQL 8.0
 - Maven (gestión de dependencias)
 
@@ -37,6 +39,10 @@ API-2025-Grupo-6/
 │   │   │   ├── controller/           # REST Controllers
 │   │   │   ├── model/                # JPA Entities
 │   │   │   └── repository/           # JPA Repositories
+│   │   │   └── config/               # Spring Security and application 
+│   │   │   └── dto/                  # Data Transfer Objects
+│   │   │   └── exception/            # Custom exception classes
+│   │   │   └── service/              # Services
 │   │   ├── src/main/resources/
 │   │   │   ├── application.properties # Database configuration
 │   │   │   └── data.sql              # Initial data seeding
