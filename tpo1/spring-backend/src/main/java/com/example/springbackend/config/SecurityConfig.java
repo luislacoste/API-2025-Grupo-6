@@ -18,22 +18,22 @@ import com.example.springbackend.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Configuración de seguridad de la aplicación.
- * Define autenticación, autorización y permisos por ruta.
- */
+* Application security settings.
+* Defines authentication, authorization, and permissions per route.
+*/
 
-@Configuration // Clase de configuración de Spring
-@EnableWebSecurity // Activa Spring Security
-@RequiredArgsConstructor // Inyección de dependencias por constructor
+@Configuration // Spring configuration class
+@EnableWebSecurity // Enable Spring Security
+@RequiredArgsConstructor // Dependency injection by constructor
 public class SecurityConfig {
 
-    // Repositorio para acceder a usuarios en la BD
+    // Repository to access users in the DB
     private final UsuarioRepository usuarioRepository;
 
     /**
-     * Servicio que carga usuarios desde la BD por email.
-     * Usado por Spring Security durante el login.
-     */
+    * Service that loads users from the database via email.
+    * Used by Spring Security during login.
+    */
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> usuarioRepository.findByEmail(username)
@@ -41,51 +41,51 @@ public class SecurityConfig {
     }
 
     /**
-     * Gestor de autenticación de Spring Security.
-     * Necesario para procesos de login personalizados.
-     */
+    * Spring Security authentication manager.
+    * Required for custom login processes.
+    */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
     /**
-     * Codificador de contraseñas usando BCrypt.
-     * BCrypt es seguro, irreversible e incluye salt automáticamente.
-     */
+    * Password encoder using BCrypt.
+    * BCrypt is secure, irreversible, and automatically includes salts.
+    */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     /**
-     * Configuración de la cadena de filtros de seguridad.
-     * Define qué rutas son públicas, cuáles requieren autenticación,
-     * y cuáles necesitan roles específicos.
-     */
+    * Security filter chain configuration.
+    * Defines which routes are public, which require authentication,
+    * and which require specific roles.
+    */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Desactiva CSRF (para APIs REST stateless)
+                // Disable CSRF (for stateless REST APIs)
                 .csrf(csrf -> csrf.disable())
                 
-                // Configuración de autorización por ruta
+                // Route authorization configuration
                 .authorizeHttpRequests(auth -> auth
                         
-                        // Rutas públicas (sin autenticación)
-                        .requestMatchers("/api/auth/**").permitAll() // Login y registro
-                        .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll() // Ver productos
+                        // Public routes (no authentication)
+                        .requestMatchers("/api/auth/**").permitAll() 
+                        .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
                         
-                        // Rutas que requieren autenticación
-                        .requestMatchers(HttpMethod.POST, "/api/productos").authenticated() // Crear producto
-                        .requestMatchers(HttpMethod.PUT, "/api/productos/**").authenticated() // Actualizar producto
-                        .requestMatchers(HttpMethod.DELETE, "/api/productos/**").authenticated() // Eliminar producto
-                        .requestMatchers("/api/pedidos/**").authenticated() // Gestionar pedidos
+                        // Routes that require authentication
+                        .requestMatchers(HttpMethod.POST, "/api/productos").authenticated() 
+                        .requestMatchers(HttpMethod.PUT, "/api/productos/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/productos/**").authenticated()
+                        .requestMatchers("/api/pedidos/**").authenticated()
                         
-                        // Rutas que requieren rol específico
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // Solo administradores
+                        // Routes that require a specific role
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         
-                        // Cualquier otra ruta requiere autenticación por defecto
+                        // Any other route requires authentication by default
                         .anyRequest().authenticated());
 
         return http.build();
