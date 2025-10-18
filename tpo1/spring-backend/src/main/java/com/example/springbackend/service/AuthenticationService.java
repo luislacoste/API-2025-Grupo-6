@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.springbackend.dto.LoginRequest;
 import com.example.springbackend.dto.RegisterRequest;
+import com.example.springbackend.exception.EmailAlreadyExistsException;
 import com.example.springbackend.model.Role;
 import com.example.springbackend.model.Usuario;
 import com.example.springbackend.repository.UsuarioRepository;
@@ -25,7 +26,9 @@ public class AuthenticationService {
 
     public String register(RegisterRequest request) {
         if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new EmailAlreadyExistsException(
+                "There is already a registered user with the email: " + request.getEmail()
+            );
         }
 
         Usuario usuario = Usuario.builder()
