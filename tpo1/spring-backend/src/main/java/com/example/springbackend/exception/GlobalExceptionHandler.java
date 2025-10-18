@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Manejador global de excepciones (ControllerAdvice)
- * Captura errores comunes y los transforma en respuestas JSON claras para el cliente.
+ * Global exception handler (ControllerAdvice)
+ * Captures common errors and transforms them into clear JSON responses for the client.
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneric(Exception ex) {
-        // Captura cualquier otro error no manejado explícitamente
+        // Catch any other errors not handled explicitly
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", ex.getMessage()));
