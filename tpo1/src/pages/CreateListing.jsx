@@ -147,7 +147,7 @@ const CreateListing = () => {
 
     try {
       const imageUrls = processImages();
-      // Armamos el objeto producto
+      // Armamos el objeto producto (el servicio transformará a image, price en centavos, etc.)
       const productData = {
         name: formData.name,
         price: formData.price,
@@ -155,7 +155,8 @@ const CreateListing = () => {
         description: formData.description,
         stock: formData.stock,
         images: imageUrls,
-        userId: user?.id || 'anonymous'
+        // No enviar userId si no hay id numérico del backend
+        ...(typeof user?.id === 'number' ? { userId: user.id } : {})
       };
 
       // Guardamos el producto usando la función del contexto

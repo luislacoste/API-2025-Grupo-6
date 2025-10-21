@@ -74,7 +74,14 @@ public class SecurityConfig {
                         
                         // Public routes (no authentication)
                         .requestMatchers("/api/auth/**").permitAll() 
+                        // Public GET endpoints for React app
+                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        // Legacy/alt path if used
                         .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                        // Allow creation from frontend for now (no auth token configured yet)
+                        .requestMatchers(HttpMethod.POST, "/products").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/categories").permitAll()
                         
                         // Routes that require authentication
                         .requestMatchers(HttpMethod.POST, "/api/productos").authenticated() 

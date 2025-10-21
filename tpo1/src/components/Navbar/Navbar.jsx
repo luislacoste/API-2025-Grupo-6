@@ -143,7 +143,7 @@ const Navbar = () => {
                 )}
               </Link>
               <span className="user-greeting">
-                Hola, {user.firstName}!
+                Hola, {(user.firstName || user.username || user.email)}!
               </span>
               <button onClick={handleLogout} className="logout-button">
                 Cerrar Sesión

@@ -74,15 +74,31 @@ export const fetchProductsByCategory = async (categoryName) => {
 // Función para crear un nuevo producto
 export const createProduct = async (productData) => {
   try {
+    // Transformar datos al formato esperado por el backend
+    const priceCents = Math.round(parseFloat(productData.price) * 100);
+    const stockInt = parseInt(productData.stock, 10);
+    const image = Array.isArray(productData.images) && productData.images.length > 0
+      ? productData.images[0]
+      : productData.image || '';
+
+    const payload = {
+      name: productData.name,
+      price: priceCents,
+      category: productData.category,
+      description: productData.description,
+      image,
+      stock: Number.isFinite(stockInt) ? stockInt : 0,
+      // userId opcional: sólo si viene numérico
+      ...(typeof productData.userId === 'number' ? { userId: productData.userId } : {}),
+      createdAt: new Date().toISOString()
+    };
+
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        ...productData,
-        createdAt: new Date().toISOString()
-      })
+      body: JSON.stringify(payload)
     });
     
     if (!response.ok) {
@@ -177,5 +193,62 @@ export const createCategory = async (categoryData) => {
     return newCategory;
   } catch (error) {
     throw new Error(`Error al crear categoría: ${error.message}`);
+  }
+};
+
+// ===================== AUTH =====================
+// Registro de usuario contra Spring Boot
+export const registerUser = async ({ firstName, lastName, email, password }) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombre: firstName,
+        apellido: lastName,
+        email,
+        password
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data?.message || 'Error en registro');
+    }
+    // Mapeo a user de frontend
+    const user = {
+      id: data.id,
+      firstName: data.nombre,
+      lastName: data.apellido,
+      email: data.email
+    };
+    return { success: true, user };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Login contra Spring Boot
+export const loginUser = async (email, password) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data?.message || 'Error en login');
+    }
+    const user = {
+      id: data.id,
+      firstName: data.nombre,
+      lastName: data.apellido,
+      email: data.email
+    };
+    return { success: true, user };
+  } catch (error) {
+    return { success: false, error: error.message };
   }
 };

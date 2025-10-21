@@ -1,11 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { fetchProducts as fetchProductsFromAPI } from '../../services/api';
 import './ProductList.css';
 
 const ProductList = ({ products, loading }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+
+  // Soporte para modo auto-fetch desde backend si no vienen props
+  const [internalProducts, setInternalProducts] = useState(products || []);
+  const [internalLoading, setInternalLoading] = useState(
+    typeof loading === 'boolean' ? loading : !products
+  );
+
+  useEffect(() => {
+    // Si nos pasan productos por props, usamos esos
+    if (Array.isArray(products)) {
+      setInternalProducts(products);
+      setInternalLoading(!!loading);
+      return;
+    }
+
+    // Si no hay productos por props, los traemos del backend
+    let cancelled = false;
+    const load = async () => {
+      try {
+        setInternalLoading(true);
+        const data = await fetchProductsFromAPI();
+        if (!cancelled) setInternalProducts(data || []);
+      } catch (e) {
+        console.error('Error cargando productos:', e);
+      } finally {
+        if (!cancelled) setInternalLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [products, loading]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
@@ -52,7 +84,7 @@ const ProductList = ({ products, loading }) => {
     }
   };
 
-  if (loading) {
+  if (internalLoading) {
     return (
       <div className="products-section">
         <h2>📦 Productos Disponibles</h2>
@@ -67,10 +99,10 @@ const ProductList = ({ products, loading }) => {
   return (
     <div className="products-section">
       <h2>📦 Productos Disponibles</h2>
-      <p className="section-subtitle">Ordenados alfabéticamente • {products.length} productos</p>
+      <p className="section-subtitle">Ordenados alfabéticamente • {internalProducts.length} productos</p>
       
       <div className="products-grid">
-        {products.map(product => (
+        {internalProducts.map(product => (
           <div 
             key={product.id} 
             className="product-card"
@@ -114,7 +146,7 @@ const ProductList = ({ products, loading }) => {
         ))}
       </div>
 
-      {products.length === 0 && (
+      {internalProducts.length === 0 && (
         <div className="empty-state">
           <div className="empty-icon">📦</div>
           <h3>No hay productos disponibles</h3>

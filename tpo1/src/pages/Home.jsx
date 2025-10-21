@@ -27,7 +27,7 @@ const Home = () => {
         <div className="authenticated-home">
           <div className="welcome-banner">
             <div className="container">
-              <h1>¡Bienvenido {user.firstName}!</h1>
+              <h1>¡Bienvenido {user.firstName || user.username || user.email}!</h1>
               <p>Descubre nuestros productos y encuentra lo que necesitas</p>
             </div>
           </div>

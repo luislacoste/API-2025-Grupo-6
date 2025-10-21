@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { registerUser, loginUser } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -23,42 +24,18 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // Registro: valida duplicados y persiste en localStorage; inicia sesión automáticamente
-  const register = (userData) => {
+  // Registro contra backend: envía datos, guarda token y usuario básico en localStorage
+  const register = async (userData) => {
     try {
-      // Obtener usuarios existentes
-      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      
-      // Verificar si el email ya existe
-      const userExists = existingUsers.find(u => u.email === userData.email);
-      if (userExists) {
-        throw new Error('El email ya está registrado');
-      }
+      const result = await registerUser(userData);
+      if (!result.success) throw new Error(result.error);
 
-      // Verificar si el nombre de usuario ya existe
-      const usernameExists = existingUsers.find(u => u.username === userData.username);
-      if (usernameExists) {
-        throw new Error('El nombre de usuario ya está en uso');
-      }
-
-      // Crear nuevo usuario
-      const newUser = {
-        id: Date.now(),
-        ...userData,
-        createdAt: new Date().toISOString()
-      };
-
-      // Guardar en lista de usuarios
-      const updatedUsers = [...existingUsers, newUser];
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-
-      // Establecer sesión actual (payload mínimo para UI)
-      const userSession = { 
-        id: newUser.id, 
-        username: newUser.username, 
-        email: newUser.email,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName
+      const userSession = {
+        id: result.user.id,
+        email: result.user.email,
+        firstName: result.user.firstName,
+        lastName: result.user.lastName,
+        username: userData.username || undefined
       };
       setUser(userSession);
       localStorage.setItem('user', JSON.stringify(userSession));
@@ -69,22 +46,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login: busca coincidencia exacta email+password en localStorage y guarda sesión
-  const login = (email, password) => {
+  // Login contra backend
+  const login = async (email, password) => {
     try {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = users.find(u => u.email === email && u.password === password);
-      
-      if (!user) {
-        throw new Error('Email o contraseña incorrectos');
-      }
+      const result = await loginUser(email, password);
+      if (!result.success) throw new Error(result.error);
 
-      const userSession = { 
-        id: user.id, 
-        username: user.username, 
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName
+      const userSession = {
+        id: result.user.id,
+        email: result.user.email,
+        firstName: result.user.firstName,
+        lastName: result.user.lastName
       };
       setUser(userSession);
       localStorage.setItem('user', JSON.stringify(userSession));
@@ -99,6 +71,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   const value = {

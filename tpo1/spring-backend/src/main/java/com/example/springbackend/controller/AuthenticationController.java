@@ -5,15 +5,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.example.springbackend.dto.LoginRequest;
 import com.example.springbackend.dto.RegisterRequest;
+import com.example.springbackend.dto.AuthResponse;
 import com.example.springbackend.service.AuthenticationService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
@@ -29,7 +32,7 @@ public class AuthenticationController {
     // }'
     //http://localhost:8080/api/auth/register
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
     }
 
@@ -41,7 +44,7 @@ public class AuthenticationController {
     // }'
     //http://localhost:8080/api/auth/login
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 }

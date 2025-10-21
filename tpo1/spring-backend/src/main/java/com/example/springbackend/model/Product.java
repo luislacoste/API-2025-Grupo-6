@@ -18,6 +18,8 @@ public class Product {
     @Column(length = 2000)
     private String description;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT") // permite almacenar Base64 grandes
     private String image;
     private Integer stock;
     @Column(name = "created_at")
