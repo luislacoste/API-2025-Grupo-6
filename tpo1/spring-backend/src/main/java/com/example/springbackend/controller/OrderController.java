@@ -46,7 +46,8 @@ public class OrderController {
                     return orderRepository.save(order);
                 })
                 .orElseGet(() -> {
-                    updatedOrder.setId(id);
+                    // If the order doesn't exist, save the provided updatedOrder as a new entity
+                    // (assumes the persistence layer will generate an ID)
                     return orderRepository.save(updatedOrder);
                 });
     }
