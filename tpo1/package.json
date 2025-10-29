@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "frontend": "vite",
     "backend:boot": "mvn -q -f spring-backend/pom.xml spring-boot:run",
-    "dev": "concurrently \"npm run frontend\" \"npm run backend:boot\""
+    "dev": "concurrently \"npm run frontend\""
   },
   "dependencies": {
     "react": "^19.1.1",

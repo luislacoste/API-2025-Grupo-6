@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/orders")
-@CrossOrigin(origins = "*")
+// @CrossOrigin(origins = "*") TODO: borrar
 public class OrderController {
 
     private final OrderRepository orderRepository;

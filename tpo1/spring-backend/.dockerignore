@@ -1,0 +1,11 @@
+# Ignore Maven build artifacts
+target/
+
+# Ignore IDE files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Ignore logs
+*.log
