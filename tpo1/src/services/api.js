@@ -3,6 +3,38 @@
 
 const API_BASE_URL = 'http://localhost:3000';
 
+// Helper to build headers including Authorization if token exists in localStorage
+// Resilient: looks for token under several keys in localStorage and falls back
+// to parsing a saved `user` object if necessary.
+const getAuthHeaders = (extraHeaders = {}) => {
+  const headers = { ...extraHeaders };
+  try {
+    // Primary location: explicit `token` key
+    let token = localStorage.getItem('token');
+
+    // Fallback: maybe older code saved token inside the `user` object
+    if (!token) {
+      const savedUser = localStorage.getItem('user');
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser);
+          if (parsed && parsed.token) token = parsed.token;
+        } catch (err) {
+          // ignore parse errors
+        }
+      }
+    }
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  } catch (e) {
+    // localStorage might not be available in some environments (SSR/tests)
+  }
+
+  return headers;
+};
+
 // Función helper para hacer fetch de productos
 export const fetchProducts = async () => {
   try {
@@ -96,7 +128,7 @@ export const createProduct = async (productData) => {
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        ...getAuthHeaders({ 'Content-Type': 'application/json' }),
       },
       body: JSON.stringify(payload)
     });
@@ -116,7 +148,8 @@ export const createProduct = async (productData) => {
 export const deleteProductById = async (id) => {
   try {
     const response = await fetch(`${API_BASE_URL}/products/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getAuthHeaders()
     });
     
     if (!response.ok) {
@@ -133,11 +166,10 @@ export const deleteProductById = async (id) => {
 // Función para actualizar un producto (incluyendo stock)
 export const updateProduct = async (id, productData) => {
   try {
+    console.log(getAuthHeaders());
     const response = await fetch(`${API_BASE_URL}/products/${id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(productData)
     });
     
@@ -175,9 +207,7 @@ export const createCategory = async (categoryData) => {
   try {
     const response = await fetch(`${API_BASE_URL}/categories`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         ...categoryData,
         productCount: 0,
@@ -222,7 +252,8 @@ export const registerUser = async ({ firstName, lastName, email, password }) => 
       lastName: data.apellido,
       email: data.email
     };
-    return { success: true, user };
+    // Return token when present
+    return { success: true, user, token: data.token };
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -238,6 +269,7 @@ export const loginUser = async (email, password) => {
     });
 
     const data = await response.json();
+    console.log('Login response data:', data);
     if (!response.ok) {
       throw new Error(data?.message || 'Error en login');
     }
@@ -247,7 +279,7 @@ export const loginUser = async (email, password) => {
       lastName: data.apellido,
       email: data.email
     };
-    return { success: true, user };
+    return { success: true, user, token: data.token };
   } catch (error) {
     return { success: false, error: error.message };
   }

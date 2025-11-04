@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -71,7 +72,10 @@ public class SecurityConfig {
     * and which require specific roles.
     */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    // Accept JwtAuthenticationFilter as a method parameter to avoid a constructor
+    // injection cycle: SecurityConfig -> JwtAuthenticationFilter -> UserDetailsService -> SecurityConfig
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                  com.example.springbackend.security.JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 // Disable CSRF (for stateless REST APIs)
                 .csrf(csrf -> csrf.disable())
@@ -103,6 +107,9 @@ public class SecurityConfig {
                         
                         // Any other route requires authentication by default
                         .anyRequest().authenticated());
+
+    // Add JWT filter before the UsernamePasswordAuthenticationFilter so JWTs are processed
+    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

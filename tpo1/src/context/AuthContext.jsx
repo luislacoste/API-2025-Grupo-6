@@ -13,13 +13,18 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Carga inicial: intenta restaurar sesión desde localStorage
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
+    const savedToken = localStorage.getItem('token');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
+    }
+    if (savedToken) {
+      setToken(savedToken);
     }
     setLoading(false);
   }, []);
@@ -38,7 +43,11 @@ export const AuthProvider = ({ children }) => {
         username: userData.username || undefined
       };
       setUser(userSession);
+      setToken(result.token || null);
       localStorage.setItem('user', JSON.stringify(userSession));
+      if (result.token) {
+        localStorage.setItem('token', result.token);
+      }
 
       return { success: true, user: userSession };
     } catch (error) {
@@ -59,7 +68,11 @@ export const AuthProvider = ({ children }) => {
         lastName: result.user.lastName
       };
       setUser(userSession);
+      setToken(result.token || null);
       localStorage.setItem('user', JSON.stringify(userSession));
+      if (result.token) {
+        localStorage.setItem('token', result.token);
+      }
 
       return { success: true, user: userSession };
     } catch (error) {
@@ -70,12 +83,14 @@ export const AuthProvider = ({ children }) => {
   // Logout: limpia la sesión actual
   const logout = () => {
     setUser(null);
+    setToken(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
   };
 
   const value = {
     user,
+    token,
     login,
     register,
     logout,

@@ -24,6 +24,7 @@ public class AuthenticationService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final com.example.springbackend.security.JwtUtil jwtUtil;
 
     public AuthResponse register(RegisterRequest request) {
         if (usuarioRepository.existsByEmail(request.getEmail())) {
@@ -41,11 +42,14 @@ public class AuthenticationService {
                     .build();
 
     usuarioRepository.save(usuario);
+    // generate token for the newly created user
+    String token = jwtUtil.generateToken(usuario.getEmail());
     return AuthResponse.builder()
         .id(usuario.getId())
                 .nombre(usuario.getNombre())
                 .apellido(usuario.getApellido())
                 .email(usuario.getEmail())
+                .token(token)
                 .build();
     }
 
@@ -56,11 +60,13 @@ public class AuthenticationService {
                         request.getPassword()));
     Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalStateException("User not found after authentication"));
+    String token = jwtUtil.generateToken(usuario.getEmail());
     return AuthResponse.builder()
         .id(usuario.getId())
                 .nombre(usuario.getNombre())
                 .apellido(usuario.getApellido())
                 .email(usuario.getEmail())
+                .token(token)
                 .build();
     }
 }
