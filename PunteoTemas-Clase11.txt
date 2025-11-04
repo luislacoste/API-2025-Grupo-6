@@ -1,0 +1,66 @@
+Clase 11: Seguridad en Spring Boot 
+=================================================
+
+Contexto del Proyecto:
+Estamos integrando seguridad al e-commerce React que ya cuenta con:
+	Frontend: React (productos, carrito, interfaz de usuario)
+	Backend: API REST Spring Boot (CRUD de productos, usuarios, pedidos)
+	Base de datos: MySQL con Spring Data JPA (entidades: Producto, Categoria, Usuario, Pedido)
+
+
+
+1. Spring Security  
+Función: Framework central para proteger endpoints, gestionar autenticación/autorización y defensa contra ataques.  
+
+Framework de seguridad para aplicaciones Spring que maneja:
+	Autenticación (verificar identidad: ¿quién eres?). Esto significa asegurarse de que quien dice ser un usuario, realmente lo es. 
+	Autorización (control de acceso: ¿qué puedes hacer?). Determinar qué puede hacer un usuario una vez que ha sido autenticado
+	Protección contra ataques (CSRF, inyecciones, etc.). Ofrece protección integrada contra vulnerabilidades de seguridad comunes:
+		Cross-Site Scripting (XSS, inyectar js robar cookies)
+		CSRF (Cross-Site Request Forgery), navegador para enviar automáticamente las cookies de sesión independientemente de dónde se origine la solicitud
+		Ataques de fuerza bruta (adivinar contraseña mediante combinaciones o pass comunes ), etc.
+
+
+¿Para qué sirve en nuestro e-commerce?
+Proteger recursos:
+	Evitar que usuarios no autenticados realicen pedidos.
+	Restringir que solo admins eliminen productos.
+
+Gestionar usuarios:
+	Login/logout seguro.
+	Asignar roles (USER, ADMIN).
+
+Defender la aplicación:
+	XSS, CSRF, etc.
+	
+¿Cómo se usa Spring Security?
+El uso de Spring Security generalmente implica los siguientes pasos:
+	- Añadir las dependencias: Incluir las bibliotecas de Spring Security en tu proyecto Maven.
+	- Configuración de seguridad: Crear una clase de configuración (usualmente anotada con @Configuration y @EnableWebSecurity). Aquí es donde defines las reglas de autenticación y autorización.
+	- Definir usuarios y roles: configurar usuarios con una base de datos 
+	- Manejo de la autenticación y la autorización: automáticamente maneja el flujo de inicio de sesión, la creación de sesiones, la validación de credenciales y la aplicación de las reglas de autorización.	
+	
+
+Subtemas con ejemplos prácticos:  
+a) Configuración básica  
+SecurityConfig.java
+
+Esta configuración define las reglas de seguridad para tu API del e-commerce. Controla:
+	Qué endpoints son públicos (acceso sin login).
+	Qué endpoints requieren autenticación.
+	Qué endpoints requieren roles específicos (ej: ADMIN).
+	Mecanismos de protección contra ataques comunes.
+
+
+b) Protección contra ataques comunes  
+- CSRF: Deshabilitado en APIs stateless 
+Cross-Site Request Forgery (Falsificación de Petición en Sitios Cruzados)
+Los ataques CSRF se basan en la capacidad del navegador para enviar automáticamente las cookies de sesión independientemente de dónde se origine la solicitud (incluso desde un sitio web malicioso).
+Dado que las APIs stateless basadas en tokens no dependen de las cookies de sesión que se envían automáticamente, la principal vía de ataque de CSRF se bloquea. 
+
+
+
+2. Autenticación y Autorización  
+- Autenticación: Verificar identidad (¿Eres quien dices ser?).  
+- Autorización: Asignar permisos (¿Qué puedes hacer?).
+

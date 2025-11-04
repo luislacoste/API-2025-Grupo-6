@@ -24,7 +24,7 @@ public class AuthenticationService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final com.example.springbackend.security.JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
     public AuthResponse register(RegisterRequest request) {
         if (usuarioRepository.existsByEmail(request.getEmail())) {
@@ -41,11 +41,17 @@ public class AuthenticationService {
                     .role(Role.USER)
                     .build();
 
-    usuarioRepository.save(usuario);
-    // generate token for the newly created user
-    String token = jwtUtil.generateToken(usuario.getEmail());
-    return AuthResponse.builder()
-        .id(usuario.getId())
+        usuarioRepository.save(usuario);
+        
+        // Generate JWT token for the new user
+        Set<String> roles = usuario.getAuthorities().stream()
+                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                .collect(Collectors.toSet());
+        
+        String token = jwtUtil.generateToken(usuario.getEmail(), roles);
+        
+        return AuthResponse.builder()
+                .id(usuario.getId())
                 .nombre(usuario.getNombre())
                 .apellido(usuario.getApellido())
                 .email(usuario.getEmail())
@@ -58,11 +64,19 @@ public class AuthenticationService {
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()));
-    Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
+                        
+        Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalStateException("User not found after authentication"));
-    String token = jwtUtil.generateToken(usuario.getEmail());
-    return AuthResponse.builder()
-        .id(usuario.getId())
+        
+        // Generate JWT token
+        Set<String> roles = usuario.getAuthorities().stream()
+                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                .collect(Collectors.toSet());
+        
+        String token = jwtUtil.generateToken(usuario.getEmail(), roles);
+        
+        return AuthResponse.builder()
+                .id(usuario.getId())
                 .nombre(usuario.getNombre())
                 .apellido(usuario.getApellido())
                 .email(usuario.getEmail())

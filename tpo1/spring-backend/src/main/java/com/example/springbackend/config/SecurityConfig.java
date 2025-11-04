@@ -1,6 +1,5 @@
 package com.example.springbackend.config;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
@@ -10,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.CorsBeanDefinitionParser;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,6 +35,9 @@ public class SecurityConfig {
 
     // Repository to access users in the DB
     private final UsuarioRepository usuarioRepository;
+    
+    // JWT Filter to validate tokens
+    private final JwtFilter jwtFilter;
 
     /**
     * Service that loads users from the database via email.
@@ -82,31 +83,43 @@ public class SecurityConfig {
         // Enable CORS and use the corsConfigurationSource() bean defined below
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 
+                // Enable CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                
                 // Route authorization configuration
                 .authorizeHttpRequests(auth -> auth
                         
-                        // Public routes (no authentication)
+                        // Public routes - Authentication endpoints
                         .requestMatchers("/api/auth/**").permitAll() 
-                        // Public GET endpoints for React app
+                        
+                        // Public routes - GET operations (anyone can view)
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
-                        // Legacy/alt path if used
-                        .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-                        // Allow creation from frontend for now (no auth token configured yet)
-                        .requestMatchers(HttpMethod.POST, "/products").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/categories").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/orders/**").permitAll()
                         
-                        // Routes that require authentication
-                        .requestMatchers(HttpMethod.POST, "/api/productos").authenticated() 
-                        .requestMatchers(HttpMethod.PUT, "/api/productos/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/productos/**").authenticated()
-                        .requestMatchers("/api/pedidos/**").authenticated()
+                        // POST Products - Require authentication
+                        .requestMatchers(HttpMethod.POST, "/products").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/products/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
                         
-                        // Routes that require a specific role
+                        // Categories - Only ADMIN can modify
+                        .requestMatchers(HttpMethod.POST, "/categories").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/categories/**").hasRole("ADMIN")
+                        
+                        // Orders - Require authentication
+                        .requestMatchers(HttpMethod.POST, "/orders").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/orders/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/orders/**").hasAnyRole("ADMIN", "USER")
+                        
+                        // Admin specific routes
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         
                         // Any other route requires authentication by default
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated())
+                
+                // Add JWT filter before UsernamePasswordAuthenticationFilter
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
     // Add JWT filter before the UsernamePasswordAuthenticationFilter so JWTs are processed
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
