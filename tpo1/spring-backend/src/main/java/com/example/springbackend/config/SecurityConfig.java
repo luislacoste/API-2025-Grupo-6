@@ -75,6 +75,8 @@ public class SecurityConfig {
         http
                 // Disable CSRF (for stateless REST APIs)
                 .csrf(csrf -> csrf.disable())
+        // Enable CORS and use the corsConfigurationSource() bean defined below
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 
                 // Route authorization configuration
                 .authorizeHttpRequests(auth -> auth
