@@ -1,7 +1,7 @@
 package com.example.springbackend.controller;
 
 import com.example.springbackend.model.Category;
-import com.example.springbackend.repository.CategoryRepository;
+import com.example.springbackend.service.CategoryService;
 import com.example.springbackend.dto.CategoryDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -9,17 +9,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/categories")
 // @CrossOrigin(origins = "http://localhost:5173") TODO: borrar
 public class CategoryController {
 
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
-    public CategoryController(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
     @GetMapping
@@ -30,7 +29,7 @@ public class CategoryController {
      * curl -s "http://localhost:3000/categories" | jq .
      */
     public List<CategoryDTO> all() {
-        return categoryRepository.findAll().stream().map(this::toDto).toList();
+    return categoryService.findAll().stream().map(this::toDto).toList();
     }
 
     @GetMapping("/{id}")
@@ -44,8 +43,7 @@ public class CategoryController {
      * curl -i "http://localhost:3000/categories/1"
      */
     public ResponseEntity<CategoryDTO> getById(@PathVariable Long id) {
-        Optional<Category> c = categoryRepository.findById(id);
-        return c.map(cat -> ResponseEntity.ok(toDto(cat))).orElseGet(() -> ResponseEntity.notFound().build());
+    return categoryService.findById(id).map(cat -> ResponseEntity.ok(toDto(cat))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -59,10 +57,9 @@ public class CategoryController {
      *   -d '{"name":"Books","description":"All kinds of books","icon":"book","productCount":0}'
      */
     public ResponseEntity<CategoryDTO> create(@Valid @RequestBody CategoryDTO categoryDto) {
-        Category category = fromDto(categoryDto);
-        if (category.getProductCount() == null) category.setProductCount(0);
-        var saved = categoryRepository.save(category);
-        return ResponseEntity.created(URI.create("/categories/" + saved.getId())).body(toDto(saved));
+    Category category = fromDto(categoryDto);
+    var saved = categoryService.create(category);
+    return ResponseEntity.created(URI.create("/categories/" + saved.getId())).body(toDto(saved));
     }
 
     @PutMapping("/{id}")
@@ -76,15 +73,8 @@ public class CategoryController {
      *   -d '{"name":"Electronics","description":"Gadgets","icon":"devices","productCount":42}'
      */
     public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @Valid @RequestBody CategoryDTO categoryDto) {
-        Optional<Category> existing = categoryRepository.findById(id);
-        if (existing.isEmpty()) return ResponseEntity.notFound().build();
-        Category c = existing.get();
-        c.setName(categoryDto.getName());
-        c.setDescription(categoryDto.getDescription());
-        c.setIcon(categoryDto.getIcon());
-        c.setProductCount(categoryDto.getProductCount());
-        var saved = categoryRepository.save(c);
-        return ResponseEntity.ok(toDto(saved));
+    var savedOpt = categoryService.update(id, fromDto(categoryDto));
+    return savedOpt.map(cat -> ResponseEntity.ok(toDto(cat))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -97,8 +87,8 @@ public class CategoryController {
      * curl -i -X DELETE "http://localhost:3000/categories/1"
      */
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!categoryRepository.existsById(id)) return ResponseEntity.notFound().build();
-        categoryRepository.deleteById(id);
+        if (!categoryService.exists(id)) return ResponseEntity.notFound().build();
+        categoryService.delete(id);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,26 +1,24 @@
 package com.example.springbackend.controller;
 
 import com.example.springbackend.model.Product;
-import com.example.springbackend.repository.ProductRepository;
+import com.example.springbackend.service.ProductService;
 import com.example.springbackend.dto.ProductDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
 
 public class ProductController {
 
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
-    public ProductController(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
     @GetMapping
@@ -31,7 +29,7 @@ public class ProductController {
      * curl -s "http://localhost:3000/products" | jq .
      */
     public List<ProductDTO> all() {
-        return productRepository.findAll().stream().map(this::toDto).toList();
+    return productService.findAll().stream().map(this::toDto).toList();
     }
 
     @GetMapping("/{id}")
@@ -45,8 +43,7 @@ public class ProductController {
      * curl -i "http://localhost:3000/products/1"
      */
     public ResponseEntity<ProductDTO> getById(@PathVariable Long id) {
-        Optional<Product> p = productRepository.findById(id);
-        return p.map(prod -> ResponseEntity.ok(toDto(prod))).orElseGet(() -> ResponseEntity.notFound().build());
+    return productService.findById(id).map(prod -> ResponseEntity.ok(toDto(prod))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping(params = "category")
@@ -57,7 +54,7 @@ public class ProductController {
      * curl -s "http://localhost:3000/products?category=Electronics" | jq .
      */
     public List<ProductDTO> byCategory(@RequestParam String category) {
-        return productRepository.findByCategory(category).stream().map(this::toDto).toList();
+    return productService.findByCategory(category).stream().map(this::toDto).toList();
     }
 
     @PostMapping
@@ -71,10 +68,9 @@ public class ProductController {
      *   -d '{"name":"Phone","price":59900,"category":"Electronics","description":"Smartphone","image":"/img/phone.png","stock":10,"userId":1}'
      */
     public ResponseEntity<ProductDTO> create(@Valid @RequestBody ProductDTO productDto) {
-        Product product = fromDto(productDto);
-        if (product.getCreatedAt() == null) product.setCreatedAt(Instant.now());
-        Product saved = productRepository.save(product);
-        return ResponseEntity.created(URI.create("/products/" + saved.getId())).body(toDto(saved));
+    Product product = fromDto(productDto);
+    Product saved = productService.create(product);
+    return ResponseEntity.created(URI.create("/products/" + saved.getId())).body(toDto(saved));
     }
 
     @PutMapping("/{id}")
@@ -88,18 +84,8 @@ public class ProductController {
      *   -d '{"name":"Phone X","price":64900,"category":"Electronics","description":"Updated","image":"/img/phone-x.png","stock":8,"userId":1}'
      */
     public ResponseEntity<ProductDTO> update(@PathVariable Long id, @Valid @RequestBody ProductDTO productDto) {
-        Optional<Product> existing = productRepository.findById(id);
-        if (existing.isEmpty()) return ResponseEntity.notFound().build();
-        Product p = existing.get();
-        p.setName(productDto.getName());
-        p.setPrice(productDto.getPrice());
-        p.setCategory(productDto.getCategory());
-        p.setDescription(productDto.getDescription());
-        p.setImage(productDto.getImage());
-        p.setStock(productDto.getStock());
-        // note: ProductDTO does not contain userId; we don't overwrite it here
-        Product saved = productRepository.save(p);
-        return ResponseEntity.ok(toDto(saved));
+    var savedOpt = productService.update(id, fromDto(productDto));
+    return savedOpt.map(prod -> ResponseEntity.ok(toDto(prod))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -112,8 +98,8 @@ public class ProductController {
      * curl -i -X DELETE "http://localhost:3000/products/1"
      */
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!productRepository.existsById(id)) return ResponseEntity.notFound().build();
-        productRepository.deleteById(id);
+        if (!productService.exists(id)) return ResponseEntity.notFound().build();
+        productService.delete(id);
         return ResponseEntity.noContent().build();
     }
 

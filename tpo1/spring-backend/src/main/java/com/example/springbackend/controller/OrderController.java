@@ -1,7 +1,7 @@
 package com.example.springbackend.controller;
 
 import com.example.springbackend.model.Order;
-import com.example.springbackend.repository.OrderRepository;
+import com.example.springbackend.service.OrderService;
 import com.example.springbackend.dto.OrderDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -13,47 +13,47 @@ import java.util.List;
 // TODO @CrossOrigin(origins = "*")  borrar
 public class OrderController {
 
-    private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
-    public OrderController(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
     }
 
     // Obtener todos los pedidos
     @GetMapping
     public List<OrderDTO> getAllOrders() {
-        return orderRepository.findAll().stream().map(this::toDto).toList();
+    return orderService.findAll().stream().map(this::toDto).toList();
     }
 
     // Obtener un pedido por ID
     @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
-        return orderRepository.findById(id).map(o -> ResponseEntity.ok(toDto(o)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    return orderService.findById(id).map(o -> ResponseEntity.ok(toDto(o)))
+        .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Crear un nuevo pedido
     @PostMapping
     public ResponseEntity<OrderDTO> createOrder(@Valid @RequestBody OrderDTO orderDto) {
-        Order order = fromDto(orderDto);
-        Order saved = orderRepository.save(order);
-        return ResponseEntity.ok(toDto(saved));
+    Order order = fromDto(orderDto);
+    Order saved = orderService.create(order);
+    return ResponseEntity.ok(toDto(saved));
     }
 
     // Actualizar un pedido existente
     @PutMapping("/{id}")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @Valid @RequestBody OrderDTO updatedOrderDto) {
-        return orderRepository.findById(id)
+        return orderService.findById(id)
                 .map(order -> {
                     order.setUserId(updatedOrderDto.getUserId());
                     order.setTotal(updatedOrderDto.getTotal());
                     order.setStatus(updatedOrderDto.getStatus());
-                    Order saved = orderRepository.save(order);
+                    Order saved = orderService.update(order.getId(), order).orElse(order);
                     return ResponseEntity.ok(toDto(saved));
                 })
                 .orElseGet(() -> {
                     Order newOrder = fromDto(updatedOrderDto);
-                    Order saved = orderRepository.save(newOrder);
+                    Order saved = orderService.create(newOrder);
                     return ResponseEntity.ok(toDto(saved));
                 });
     }
@@ -61,8 +61,8 @@ public class OrderController {
     // Eliminar un pedido por ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
-        if (!orderRepository.existsById(id)) return ResponseEntity.notFound().build();
-        orderRepository.deleteById(id);
+        if (!orderService.exists(id)) return ResponseEntity.notFound().build();
+        orderService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
