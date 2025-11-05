@@ -2,6 +2,8 @@ package com.example.springbackend.controller;
 
 import com.example.springbackend.model.Product;
 import com.example.springbackend.repository.ProductRepository;
+import com.example.springbackend.dto.ProductDTO;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +30,8 @@ public class ProductController {
      * Example:
      * curl -s "http://localhost:3000/products" | jq .
      */
-    public List<Product> all() {
-        return productRepository.findAll();
+    public List<ProductDTO> all() {
+        return productRepository.findAll().stream().map(this::toDto).toList();
     }
 
     @GetMapping("/{id}")
@@ -42,9 +44,9 @@ public class ProductController {
      * Example:
      * curl -i "http://localhost:3000/products/1"
      */
-    public ResponseEntity<Product> getById(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> getById(@PathVariable Long id) {
         Optional<Product> p = productRepository.findById(id);
-        return p.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return p.map(prod -> ResponseEntity.ok(toDto(prod))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping(params = "category")
@@ -54,8 +56,8 @@ public class ProductController {
      * Example:
      * curl -s "http://localhost:3000/products?category=Electronics" | jq .
      */
-    public List<Product> byCategory(@RequestParam String category) {
-        return productRepository.findByCategory(category);
+    public List<ProductDTO> byCategory(@RequestParam String category) {
+        return productRepository.findByCategory(category).stream().map(this::toDto).toList();
     }
 
     @PostMapping
@@ -68,10 +70,11 @@ public class ProductController {
      *   -H "Content-Type: application/json" \
      *   -d '{"name":"Phone","price":59900,"category":"Electronics","description":"Smartphone","image":"/img/phone.png","stock":10,"userId":1}'
      */
-    public ResponseEntity<Product> create(@RequestBody Product product) {
+    public ResponseEntity<ProductDTO> create(@Valid @RequestBody ProductDTO productDto) {
+        Product product = fromDto(productDto);
         if (product.getCreatedAt() == null) product.setCreatedAt(Instant.now());
         Product saved = productRepository.save(product);
-        return ResponseEntity.created(URI.create("/products/" + saved.getId())).body(saved);
+        return ResponseEntity.created(URI.create("/products/" + saved.getId())).body(toDto(saved));
     }
 
     @PutMapping("/{id}")
@@ -84,19 +87,19 @@ public class ProductController {
      *   -H "Content-Type: application/json" \
      *   -d '{"name":"Phone X","price":64900,"category":"Electronics","description":"Updated","image":"/img/phone-x.png","stock":8,"userId":1}'
      */
-    public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
+    public ResponseEntity<ProductDTO> update(@PathVariable Long id, @Valid @RequestBody ProductDTO productDto) {
         Optional<Product> existing = productRepository.findById(id);
         if (existing.isEmpty()) return ResponseEntity.notFound().build();
         Product p = existing.get();
-        p.setName(product.getName());
-        p.setPrice(product.getPrice());
-        p.setCategory(product.getCategory());
-        p.setDescription(product.getDescription());
-        p.setImage(product.getImage());
-        p.setStock(product.getStock());
-        p.setUserId(product.getUserId());
+        p.setName(productDto.getName());
+        p.setPrice(productDto.getPrice());
+        p.setCategory(productDto.getCategory());
+        p.setDescription(productDto.getDescription());
+        p.setImage(productDto.getImage());
+        p.setStock(productDto.getStock());
+        // note: ProductDTO does not contain userId; we don't overwrite it here
         Product saved = productRepository.save(p);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(toDto(saved));
     }
 
     @DeleteMapping("/{id}")
@@ -112,5 +115,31 @@ public class ProductController {
         if (!productRepository.existsById(id)) return ResponseEntity.notFound().build();
         productRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Mapping helpers
+    private ProductDTO toDto(Product p) {
+        return new ProductDTO(
+                p.getId(),
+                p.getName(),
+                p.getPrice(),
+                p.getCategory(),
+                p.getDescription(),
+                p.getImage(),
+                p.getStock(),
+                p.getCreatedAt()
+        );
+    }
+
+    private Product fromDto(ProductDTO dto) {
+        Product p = new Product();
+        p.setName(dto.getName());
+        p.setPrice(dto.getPrice());
+        p.setCategory(dto.getCategory());
+        p.setDescription(dto.getDescription());
+        p.setImage(dto.getImage());
+        p.setStock(dto.getStock());
+        p.setCreatedAt(dto.getCreatedAt());
+        return p;
     }
 }

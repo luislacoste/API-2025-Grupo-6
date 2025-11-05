@@ -2,6 +2,8 @@ package com.example.springbackend.controller;
 
 import com.example.springbackend.model.Category;
 import com.example.springbackend.repository.CategoryRepository;
+import com.example.springbackend.dto.CategoryDTO;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,8 +29,8 @@ public class CategoryController {
      * Example:
      * curl -s "http://localhost:3000/categories" | jq .
      */
-    public List<Category> all() {
-        return categoryRepository.findAll();
+    public List<CategoryDTO> all() {
+        return categoryRepository.findAll().stream().map(this::toDto).toList();
     }
 
     @GetMapping("/{id}")
@@ -41,9 +43,9 @@ public class CategoryController {
      * Example:
      * curl -i "http://localhost:3000/categories/1"
      */
-    public ResponseEntity<Category> getById(@PathVariable Long id) {
+    public ResponseEntity<CategoryDTO> getById(@PathVariable Long id) {
         Optional<Category> c = categoryRepository.findById(id);
-        return c.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return c.map(cat -> ResponseEntity.ok(toDto(cat))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -56,10 +58,11 @@ public class CategoryController {
      *   -H "Content-Type: application/json" \
      *   -d '{"name":"Books","description":"All kinds of books","icon":"book","productCount":0}'
      */
-    public ResponseEntity<Category> create(@RequestBody Category category) {
+    public ResponseEntity<CategoryDTO> create(@Valid @RequestBody CategoryDTO categoryDto) {
+        Category category = fromDto(categoryDto);
         if (category.getProductCount() == null) category.setProductCount(0);
         var saved = categoryRepository.save(category);
-        return ResponseEntity.created(URI.create("/categories/" + saved.getId())).body(saved);
+        return ResponseEntity.created(URI.create("/categories/" + saved.getId())).body(toDto(saved));
     }
 
     @PutMapping("/{id}")
@@ -72,16 +75,16 @@ public class CategoryController {
      *   -H "Content-Type: application/json" \
      *   -d '{"name":"Electronics","description":"Gadgets","icon":"devices","productCount":42}'
      */
-    public ResponseEntity<Category> update(@PathVariable Long id, @RequestBody Category category) {
+    public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @Valid @RequestBody CategoryDTO categoryDto) {
         Optional<Category> existing = categoryRepository.findById(id);
         if (existing.isEmpty()) return ResponseEntity.notFound().build();
         Category c = existing.get();
-        c.setName(category.getName());
-        c.setDescription(category.getDescription());
-        c.setIcon(category.getIcon());
-        c.setProductCount(category.getProductCount());
+        c.setName(categoryDto.getName());
+        c.setDescription(categoryDto.getDescription());
+        c.setIcon(categoryDto.getIcon());
+        c.setProductCount(categoryDto.getProductCount());
         var saved = categoryRepository.save(c);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(toDto(saved));
     }
 
     @DeleteMapping("/{id}")
@@ -97,5 +100,25 @@ public class CategoryController {
         if (!categoryRepository.existsById(id)) return ResponseEntity.notFound().build();
         categoryRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Mapping helpers
+    private CategoryDTO toDto(Category c) {
+        return CategoryDTO.builder()
+                .id(c.getId())
+                .name(c.getName())
+                .description(c.getDescription())
+                .icon(c.getIcon())
+                .productCount(c.getProductCount())
+                .build();
+    }
+
+    private Category fromDto(CategoryDTO dto) {
+        return Category.builder()
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .icon(dto.getIcon())
+                .productCount(dto.getProductCount())
+                .build();
     }
 }

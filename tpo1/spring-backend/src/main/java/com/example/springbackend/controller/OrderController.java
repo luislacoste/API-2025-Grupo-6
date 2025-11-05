@@ -2,9 +2,11 @@ package com.example.springbackend.controller;
 
 import com.example.springbackend.model.Order;
 import com.example.springbackend.repository.OrderRepository;
+import com.example.springbackend.dto.OrderDTO;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/orders")
@@ -19,42 +21,68 @@ public class OrderController {
 
     // Obtener todos los pedidos
     @GetMapping
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<OrderDTO> getAllOrders() {
+        return orderRepository.findAll().stream().map(this::toDto).toList();
     }
 
     // Obtener un pedido por ID
     @GetMapping("/{id}")
-    public Optional<Order> getOrderById(@PathVariable Long id) {
-        return orderRepository.findById(id);
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
+        return orderRepository.findById(id).map(o -> ResponseEntity.ok(toDto(o)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Crear un nuevo pedido
     @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        return orderRepository.save(order);
+    public ResponseEntity<OrderDTO> createOrder(@Valid @RequestBody OrderDTO orderDto) {
+        Order order = fromDto(orderDto);
+        Order saved = orderRepository.save(order);
+        return ResponseEntity.ok(toDto(saved));
     }
 
     // Actualizar un pedido existente
     @PutMapping("/{id}")
-    public Order updateOrder(@PathVariable Long id, @RequestBody Order updatedOrder) {
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @Valid @RequestBody OrderDTO updatedOrderDto) {
         return orderRepository.findById(id)
                 .map(order -> {
-                    order.setUserId(updatedOrder.getUserId());
-                    order.setTotal(updatedOrder.getTotal());
-                    order.setStatus(updatedOrder.getStatus());
-                    return orderRepository.save(order);
+                    order.setUserId(updatedOrderDto.getUserId());
+                    order.setTotal(updatedOrderDto.getTotal());
+                    order.setStatus(updatedOrderDto.getStatus());
+                    Order saved = orderRepository.save(order);
+                    return ResponseEntity.ok(toDto(saved));
                 })
                 .orElseGet(() -> {
-                    // If the order doesn't exist, save the provided updatedOrder as a new entity
-                    // (assumes the persistence layer will generate an ID)
-                    return orderRepository.save(updatedOrder);
+                    Order newOrder = fromDto(updatedOrderDto);
+                    Order saved = orderRepository.save(newOrder);
+                    return ResponseEntity.ok(toDto(saved));
                 });
     }
 
     // Eliminar un pedido por ID
     @DeleteMapping("/{id}")
-    public void deleteOrder(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
+        if (!orderRepository.existsById(id)) return ResponseEntity.notFound().build();
         orderRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Mapping helpers
+    private OrderDTO toDto(Order o) {
+        return OrderDTO.builder()
+                .id(o.getId())
+                .userId(o.getUserId())
+                .createdAt(o.getCreatedAt())
+                .total(o.getTotal())
+                .status(o.getStatus())
+                .build();
+    }
+
+    private Order fromDto(OrderDTO dto) {
+        Order o = new Order();
+        o.setUserId(dto.getUserId());
+        o.setCreatedAt(dto.getCreatedAt() != null ? dto.getCreatedAt() : o.getCreatedAt());
+        o.setTotal(dto.getTotal());
+        o.setStatus(dto.getStatus());
+        return o;
     }
 }
