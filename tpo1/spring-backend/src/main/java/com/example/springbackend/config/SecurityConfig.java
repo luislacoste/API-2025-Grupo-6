@@ -36,8 +36,7 @@ public class SecurityConfig {
     // Repository to access users in the DB
     private final UsuarioRepository usuarioRepository;
     
-    // JWT Filter to validate tokens
-    private final JwtFilter jwtFilter;
+    // JWT Filter will be declared as a bean below to avoid circular dependency
 
     /**
     * Service that loads users from the database via email.
@@ -73,15 +72,10 @@ public class SecurityConfig {
     * and which require specific roles.
     */
     @Bean
-    // Accept JwtAuthenticationFilter as a method parameter to avoid a constructor
-    // injection cycle: SecurityConfig -> JwtAuthenticationFilter -> UserDetailsService -> SecurityConfig
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                  com.example.springbackend.security.JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
         http
                 // Disable CSRF (for stateless REST APIs)
                 .csrf(csrf -> csrf.disable())
-        // Enable CORS and use the corsConfigurationSource() bean defined below
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 
                 // Enable CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -121,10 +115,13 @@ public class SecurityConfig {
                 // Add JWT filter before UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-    // Add JWT filter before the UsernamePasswordAuthenticationFilter so JWTs are processed
-    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
+    }
+
+    // Declare JwtFilter as a bean here (constructed with JwtUtil and the userDetailsService)
+    @Bean
+    public JwtFilter jwtFilter(com.example.springbackend.service.JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+        return new JwtFilter(jwtUtil, userDetailsService);
     }
 
     // esto va a permitir las configuraciones de CORS en toda la aplicacion de Spring
