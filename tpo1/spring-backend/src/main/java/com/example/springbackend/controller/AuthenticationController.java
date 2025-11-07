@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
-// @CrossOrigin(origins = "http://localhost:5173") TODO: borrar
 @RequiredArgsConstructor
 public class AuthenticationController {
 

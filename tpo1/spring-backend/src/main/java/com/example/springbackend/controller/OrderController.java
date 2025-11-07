@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
-// TODO @CrossOrigin(origins = "*")  borrar
 public class OrderController {
 
     private final OrderService orderService;

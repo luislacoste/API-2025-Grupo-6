@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
-// @CrossOrigin(origins = "http://localhost:5173") TODO: borrar
 public class CategoryController {
 
     private final CategoryService categoryService;
