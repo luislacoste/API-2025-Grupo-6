@@ -8,9 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
-/**
- * DTO for Order responses and creation
- */
 @Data
 @Builder
 @AllArgsConstructor

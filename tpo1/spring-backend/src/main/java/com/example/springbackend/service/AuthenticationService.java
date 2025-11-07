@@ -6,9 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.springbackend.dto.LoginRequest;
-import com.example.springbackend.dto.RegisterRequest;
-import com.example.springbackend.dto.AuthResponse;
+import com.example.springbackend.dto.LoginRequestDTO;
+import com.example.springbackend.dto.RegisterRequestDTO;
+import com.example.springbackend.dto.AuthResponseDTO;
 import com.example.springbackend.exception.EmailAlreadyExistsException;
 import com.example.springbackend.model.Role;
 import com.example.springbackend.model.Usuario;
@@ -29,7 +29,7 @@ public class AuthenticationService {
         private final AuthenticationManager authenticationManager;
         private final JwtUtil jwtUtil;
 
-        public AuthResponse register(RegisterRequest request) {
+        public AuthResponseDTO register(RegisterRequestDTO request) {
                 if (usuarioRepository.existsByEmail(request.getEmail())) {
                         throw new EmailAlreadyExistsException(
                                         "There is already a registered user with the email: " + request.getEmail());
@@ -52,7 +52,7 @@ public class AuthenticationService {
 
                 String token = jwtUtil.generateToken(usuario.getEmail(), roles);
 
-                return AuthResponse.builder()
+                return AuthResponseDTO.builder()
                                 .id(usuario.getId())
                                 .nombre(usuario.getNombre())
                                 .apellido(usuario.getApellido())
@@ -61,7 +61,7 @@ public class AuthenticationService {
                                 .build();
         }
 
-        public AuthResponse authenticate(LoginRequest request) {
+        public AuthResponseDTO authenticate(LoginRequestDTO request) {
                 authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(
                                                 request.getEmail(),
@@ -77,7 +77,7 @@ public class AuthenticationService {
 
                 String token = jwtUtil.generateToken(usuario.getEmail(), roles);
 
-                return AuthResponse.builder()
+                return AuthResponseDTO.builder()
                                 .id(usuario.getId())
                                 .nombre(usuario.getNombre())
                                 .apellido(usuario.getApellido())

@@ -6,9 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO for Category responses and creation
- */
 @Data
 @Builder
 @AllArgsConstructor
