@@ -50,6 +50,13 @@
       <version>0.11.5</version>
       <scope>runtime</scope>
     </dependency>
+
+    <!-- MapStruct for DTO mapping -->
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>1.5.5.Final</version>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
@@ -121,6 +128,19 @@
           <source>${java.version}</source>
           <target>${java.version}</target>
           <encoding>UTF-8</encoding>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>1.5.5.Final</version>
+            </path>
+            <!-- lombok annotation processor (if using lombok) -->
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>1.18.26</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
 
