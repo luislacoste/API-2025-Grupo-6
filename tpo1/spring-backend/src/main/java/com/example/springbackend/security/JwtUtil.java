@@ -1,4 +1,4 @@
-package com.example.springbackend.service;
+package com.example.springbackend.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

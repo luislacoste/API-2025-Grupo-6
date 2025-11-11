@@ -1,6 +1,5 @@
 package com.example.springbackend.config;
 
-import com.example.springbackend.service.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 // JwtFilter will be declared as a bean in SecurityConfig to avoid circular dependencies
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.example.springbackend.security.JwtUtil;
 
 import java.io.IOException;
 

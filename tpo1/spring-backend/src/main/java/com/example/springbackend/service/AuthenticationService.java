@@ -13,6 +13,7 @@ import com.example.springbackend.exception.EmailAlreadyExistsException;
 import com.example.springbackend.model.Role;
 import com.example.springbackend.model.Usuario;
 import com.example.springbackend.repository.UsuarioRepository;
+import com.example.springbackend.security.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 

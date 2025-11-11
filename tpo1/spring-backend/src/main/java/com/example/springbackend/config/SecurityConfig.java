@@ -120,7 +120,7 @@ public class SecurityConfig {
 
     // Declare JwtFilter as a bean here (constructed with JwtUtil and the userDetailsService)
     @Bean
-    public JwtFilter jwtFilter(com.example.springbackend.service.JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+    public JwtFilter jwtFilter(com.example.springbackend.security.JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         return new JwtFilter(jwtUtil, userDetailsService);
     }
 
