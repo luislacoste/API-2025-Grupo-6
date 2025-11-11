@@ -23,4 +23,5 @@ public class ProductDTO {
     private String image;
     private Integer stock;
     private Instant createdAt;
+    private Long userId;
 }

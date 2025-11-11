@@ -155,8 +155,8 @@ const CreateListing = () => {
         description: formData.description,
         stock: formData.stock,
         images: imageUrls,
-        // No enviar userId si no hay id numérico del backend
-        ...(typeof user?.id === 'number' ? { userId: user.id } : {})
+        // Enviar userId si el usuario está logueado (convertir a número si viene como string)
+        ...(user?.id ? { userId: Number(user.id) } : {})
       };
 
       // Guardamos el producto usando la función del contexto

@@ -112,7 +112,8 @@ public class ProductController {
                 p.getDescription(),
                 p.getImage(),
                 p.getStock(),
-                p.getCreatedAt()
+                p.getCreatedAt(),
+                p.getUserId()
         );
     }
 
@@ -125,6 +126,7 @@ public class ProductController {
         p.setImage(dto.getImage());
         p.setStock(dto.getStock());
         p.setCreatedAt(dto.getCreatedAt());
+        p.setUserId(dto.getUserId());
         return p;
     }
 }
