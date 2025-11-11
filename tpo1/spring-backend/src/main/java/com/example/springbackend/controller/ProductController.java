@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.http.HttpStatus;
+// SecurityContextHolder and HttpStatus are handled in SecurityConfig/service; not used here
 import com.example.springbackend.model.Usuario;
 
 @RestController
@@ -104,29 +103,16 @@ public class ProductController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!productService.exists(id))
             return ResponseEntity.notFound().build();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        Usuario usuario = (Usuario) auth.getPrincipal();
-        boolean deleted = productService.deleteIfOwnerOrAdmin(id, usuario);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/my-products")
-    public ResponseEntity<List<ProductDTO>> myProducts() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        Usuario usuario = (Usuario) auth.getPrincipal();
+    public List<ProductDTO> myProducts(Authentication authentication) {
+        // Authentication is enforced in SecurityConfig; controller assumes an authenticated principal
+        Usuario usuario = (Usuario) authentication.getPrincipal();
         Long userId = usuario.getId();
-        List<ProductDTO> list = productService.findByUserIdDto(userId);
-        return ResponseEntity.ok(list);
+        return productService.findByUserId(userId);
     }
 
 }

@@ -127,14 +127,11 @@ public class ProductService {
     /**
      * Find products by user id
      */
-    public List<Product> findByUserId(Long userId) {
-        return productRepository.findByUserId(userId);
-    }
-
     /**
      * Find products by user id and return as DTOs
+     * (Service API returns DTOs)
      */
-    public java.util.List<com.example.springbackend.dto.ProductDTO> findByUserIdDto(Long userId) {
+    public java.util.List<com.example.springbackend.dto.ProductDTO> findByUserId(Long userId) {
         java.util.List<Product> products = productRepository.findByUserId(userId);
         return productMapper.toDtoList(products);
     }

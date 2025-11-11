@@ -86,7 +86,9 @@ public class SecurityConfig {
                         // Public routes - Authentication endpoints
                         .requestMatchers("/api/auth/**").permitAll() 
                         
-                        // Public routes - GET operations (anyone can view)
+                        // GET /products/my-products should require authentication (user-specific)
+                        .requestMatchers(HttpMethod.GET, "/products/my-products").authenticated()
+                        // Public routes - other GET operations (anyone can view)
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/orders/**").permitAll()
