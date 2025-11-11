@@ -216,13 +216,17 @@ export const createCategory = async (categoryData) => {
     });
     
     if (!response.ok) {
-      throw new Error('Error al crear la categoría');
+      const errorData = await response.json().catch(() => ({}));
+      if (response.status === 403 || response.status === 401) {
+        throw new Error('Solo los administradores pueden crear categorías');
+      }
+      throw new Error(errorData.error || 'Error al crear la categoría');
     }
     
     const newCategory = await response.json();
     return newCategory;
   } catch (error) {
-    throw new Error(`Error al crear categoría: ${error.message}`);
+    throw new Error(error.message || `Error al crear categoría: ${error.message}`);
   }
 };
 

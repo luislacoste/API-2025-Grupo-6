@@ -94,7 +94,8 @@ public class SecurityConfig {
                         // POST Products - Require authentication
                         .requestMatchers(HttpMethod.POST, "/products").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/products/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
+                        // DELETE Products - Allow authenticated users (service layer validates ownership)
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").authenticated()
                         
                         // Categories - Only ADMIN can modify
                         .requestMatchers(HttpMethod.POST, "/categories").hasRole("ADMIN")

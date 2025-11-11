@@ -55,9 +55,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String, String>> handleAuthenticationException(AuthenticationException ex) {
+        // Don't expose internal authentication error details to the client (security best practice)
+        // Log the full exception for debugging (server-side only)
+        ex.printStackTrace(); // Log for debugging
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED) // 401
-                .body(Map.of("error", "Authentication failed: " + ex.getMessage()));
+                .body(Map.of("error", "Authentication failed"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -77,9 +80,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneric(Exception ex) {
         // Catch any other errors not handled explicitly
+        // Log the full exception for debugging (server-side only)
+        // Don't expose internal error messages to the client (security best practice)
         ex.printStackTrace(); // Log for debugging
+        
+        // Return a generic error message to the client
+        // The actual error details are logged server-side
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Internal server error: " + ex.getMessage()));
+                .body(Map.of("error", "An internal server error occurred. Please contact support if the problem persists."));
     }
 }

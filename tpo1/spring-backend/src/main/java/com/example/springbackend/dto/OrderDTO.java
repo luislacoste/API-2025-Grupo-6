@@ -16,7 +16,7 @@ public class OrderDTO {
     
     private Long id;
     
-    @NotNull(message = "User ID is required")
+    // userId is not required in DTO - it's set automatically by the service from the authenticated user
     private Long userId;
     
     private Instant createdAt;

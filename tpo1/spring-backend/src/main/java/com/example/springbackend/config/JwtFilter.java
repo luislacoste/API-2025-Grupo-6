@@ -46,8 +46,10 @@ public class JwtFilter extends OncePerRequestFilter {
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (Exception e) {
-                // If token extraction fails, continue without authentication
-                logger.error("Error extracting username from JWT", e);
+                // If token extraction fails, log and continue without authentication
+                // Spring Security will handle the authorization failure
+                logger.warn("Invalid JWT token: " + e.getMessage());
+                // Don't set username, so authentication will fail and Spring Security will return 401
             }
         }
 

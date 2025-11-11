@@ -60,31 +60,35 @@ public class ProductController {
     /**
      * POST /products
      * Creates a new product. If createdAt is null it defaults to now().
+     * The userId is automatically set from the authenticated user by the service layer.
      * Returns 201 Created with Location header set to /products/{id}
      * Example:
      * curl -i -X POST "http://localhost:3000/products" \
      *   -H "Content-Type: application/json" \
-     *   -d '{"name":"Phone","price":59900,"category":"Electronics","description":"Smartphone","image":"/img/phone.png","stock":10,"userId":1}'
+     *   -H "Authorization: Bearer <token>" \
+     *   -d '{"name":"Phone","price":59900,"category":"Electronics","description":"Smartphone","image":"/img/phone.png","stock":10}'
      */
     public ResponseEntity<ProductDTO> create(@Valid @RequestBody ProductDTO productDto) {
-    Product product = fromDto(productDto);
-    Product saved = productService.create(product);
-    return ResponseEntity.created(URI.create("/products/" + saved.getId())).body(toDto(saved));
+        Product product = fromDto(productDto);
+        Product saved = productService.create(product);
+        return ResponseEntity.created(URI.create("/products/" + saved.getId())).body(toDto(saved));
     }
 
     @PutMapping("/{id}")
     /**
      * PUT /products/{id}
-     * Updates an existing product's fields. Returns 200 OK with the updated product,
-     * or 404 Not Found if the id doesn't exist.
+     * Updates an existing product. Only the owner or an admin can update it.
+     * The userId cannot be changed (set automatically from authenticated user).
+     * Returns 200 OK with the updated product, or 404 Not Found when the id doesn't exist (handled by GlobalExceptionHandler).
      * Example:
      * curl -i -X PUT "http://localhost:3000/products/1" \
      *   -H "Content-Type: application/json" \
-     *   -d '{"name":"Phone X","price":64900,"category":"Electronics","description":"Updated","image":"/img/phone-x.png","stock":8,"userId":1}'
+     *   -H "Authorization: Bearer <token>" \
+     *   -d '{"name":"Phone X","price":64900,"category":"Electronics","description":"Updated","image":"/img/phone-x.png","stock":8}'
      */
     public ResponseEntity<ProductDTO> update(@PathVariable Long id, @Valid @RequestBody ProductDTO productDto) {
-    var savedOpt = productService.update(id, fromDto(productDto));
-    return savedOpt.map(prod -> ResponseEntity.ok(toDto(prod))).orElseGet(() -> ResponseEntity.notFound().build());
+        Product updated = productService.update(id, fromDto(productDto));
+        return ResponseEntity.ok(toDto(updated));
     }
 
     @DeleteMapping("/{id}")
@@ -92,12 +96,11 @@ public class ProductController {
      * DELETE /products/{id}
      * Deletes the product with the given id. Returns:
      * - 204 No Content when deletion succeeds
-     * - 404 Not Found when the id does not exist
+     * - 404 Not Found when the id does not exist (handled by GlobalExceptionHandler)
      * Example:
      * curl -i -X DELETE "http://localhost:3000/products/1"
      */
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!productService.exists(id)) return ResponseEntity.notFound().build();
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }
@@ -112,7 +115,8 @@ public class ProductController {
                 p.getDescription(),
                 p.getImage(),
                 p.getStock(),
-                p.getCreatedAt()
+                p.getCreatedAt(),
+                p.getUserId()
         );
     }
 

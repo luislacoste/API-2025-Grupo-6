@@ -65,15 +65,16 @@ public class CategoryController {
     /**
      * PUT /categories/{id}
      * Updates an existing category's fields (name, description, icon, productCount).
-     * Returns 200 OK with the updated category, or 404 Not Found if the id doesn't exist.
+     * Returns 200 OK with the updated category, or 404 Not Found if the id doesn't exist (handled by GlobalExceptionHandler).
      * Example:
      * curl -i -X PUT "http://localhost:3000/categories/1" \
      *   -H "Content-Type: application/json" \
+     *   -H "Authorization: Bearer <token>" \
      *   -d '{"name":"Electronics","description":"Gadgets","icon":"devices","productCount":42}'
      */
     public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @Valid @RequestBody CategoryDTO categoryDto) {
-    var savedOpt = categoryService.update(id, fromDto(categoryDto));
-    return savedOpt.map(cat -> ResponseEntity.ok(toDto(cat))).orElseGet(() -> ResponseEntity.notFound().build());
+        Category saved = categoryService.update(id, fromDto(categoryDto));
+        return ResponseEntity.ok(toDto(saved));
     }
 
     @DeleteMapping("/{id}")
@@ -81,12 +82,12 @@ public class CategoryController {
      * DELETE /categories/{id}
      * Deletes the category with the given id. Returns:
      * - 204 No Content when deletion succeeds
-     * - 404 Not Found when the id does not exist
+     * - 404 Not Found when the id does not exist (handled by GlobalExceptionHandler)
      * Example:
-     * curl -i -X DELETE "http://localhost:3000/categories/1"
+     * curl -i -X DELETE "http://localhost:3000/categories/1" \
+     *   -H "Authorization: Bearer <token>"
      */
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!categoryService.exists(id)) return ResponseEntity.notFound().build();
         categoryService.delete(id);
         return ResponseEntity.noContent().build();
     }

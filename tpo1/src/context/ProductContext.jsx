@@ -228,17 +228,27 @@ export const ProductProvider = ({ children }) => {
       const categoryExists = categories.find(cat => cat.name === productData.category);
 
       if (!categoryExists) {
-        // Crear nueva categoría si no existe
-        const newCategoryData = {
-          name: productData.category,
-          description: `Categoría de ${productData.category}`,
-          icon: '📦' // Icono por defecto
-        };
+        // Intentar crear nueva categoría si no existe
+        // Nota: Solo usuarios ADMIN pueden crear categorías, pero el producto puede
+        // crearse con la categoría como string aunque no exista en la tabla de categorías
+        try {
+          const newCategoryData = {
+            name: productData.category,
+            description: `Categoría de ${productData.category}`,
+            icon: '📦' // Icono por defecto
+          };
 
-        const newCategory = await createCategory(newCategoryData);
+          const newCategory = await createCategory(newCategoryData);
 
-        // Actualizar las categorías locales
-        setCategories(prev => [...prev, newCategory]);
+          // Actualizar las categorías locales solo si se creó exitosamente
+          setCategories(prev => [...prev, newCategory]);
+        } catch (categoryError) {
+          // Si falla la creación de categoría (usuario no es admin), 
+          // continuar de todas formas - el producto se creará con la categoría como string
+          console.warn('No se pudo crear la categoría en el sistema. El producto se creará con la categoría como texto:', categoryError.message);
+          // Mostrar mensaje informativo al usuario (pero no bloquear la creación del producto)
+          // El producto se creará exitosamente con la categoría como string
+        }
       }
 
       // Crear el producto en el servidor
@@ -248,22 +258,15 @@ export const ProductProvider = ({ children }) => {
       const updatedProducts = [...products, newProduct].sort((a, b) => a.name.localeCompare(b.name));
       setProducts(updatedProducts);
 
-      // Actualizar el contador de productos por categoría
+      // Actualizar el contador de productos por categoría solo para categorías existentes
       const updatedCategories = categories.map(categoria => ({
         ...categoria,
         productCount: updatedProducts.filter(producto => producto.category === categoria.name).length
       }));
 
-      // Si es una nueva categoría, asegurarse de que esté incluida
-      if (!categoryExists) {
-        const newCategoryWithCount = {
-          name: productData.category,
-          description: `Categoría de ${productData.category}`,
-          icon: '📦',
-          productCount: 1
-        };
-        updatedCategories.push(newCategoryWithCount);
-      }
+      // Si la categoría existe en la lista, actualizar su contador
+      // Si no existe (no se pudo crear porque no es admin), el producto se crea igual
+      // pero la categoría no aparecerá en la lista de categorías hasta que un admin la cree
 
       setCategories(updatedCategories);
 

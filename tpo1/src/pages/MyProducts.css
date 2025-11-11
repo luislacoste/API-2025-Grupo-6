@@ -145,16 +145,19 @@
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
-  color: white;
   backdrop-filter: blur(10px);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .status-badge.in-stock {
-  background: rgba(16, 185, 129, 0.9);
+  background: rgba(16, 185, 129, 0.95);
+  color: #ffffff;
 }
 
 .status-badge.out-stock {
   background: rgba(239, 68, 68, 0.9);
+  color: white;
 }
 
 /* Información del producto */
