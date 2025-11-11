@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useProducts } from '../context/ProductContext';
 // Se importa el contexto de autenticación para obtener datos del usuario logueado 
 import { useAuth } from '../context/AuthContext';
+import { fetchMyProducts } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import './MyProducts.css';
 
@@ -28,14 +29,39 @@ const MyProducts = () => {
   }, [ensureDataLoaded]);
 
   // Se filtran los productos para mostrar solo los creados por el usuario logueado
+  const [myProductsList, setMyProductsList] = useState(null);
+
+  // Intentamos primero obtener los productos desde el endpoint específico del usuario.
+  // Si falla o aún no se obtuvo, hacemos el fallback al filtrado local.
+  useEffect(() => {
+    let mounted = true;
+    if (!user?.id) {
+      setMyProductsList([]);
+      return () => (mounted = false);
+    }
+
+    (async () => {
+      try {
+        const data = await fetchMyProducts();
+        if (mounted) setMyProductsList(data || []);
+      } catch (err) {
+        // Si hay error, hacemos fallback a productos locales
+        console.error('No se pudieron obtener los productos del usuario:', err.message);
+        if (mounted) setMyProductsList(null);
+      }
+    })();
+
+    return () => (mounted = false);
+  }, [user]);
+
   const myProducts = useMemo(() => {
+    if (myProductsList !== null) return myProductsList;
     if (!user?.id) return [];
     return (products || []).filter((product) => {
       const pid = product?.userId;
-      // Igualar numéricamente por si viene como string del backend
       return pid != null && Number(pid) === Number(user.id);
     });
-  }, [products, user]);
+  }, [myProductsList, products, user]);
 
   // Función auxiliar para formatear precios a pesos argentinos
   const formatPrice = (price) => {

@@ -6,8 +6,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
+import com.example.springbackend.model.Usuario;
 
 @RestController
 @RequestMapping("/products")
@@ -101,8 +104,29 @@ public class ProductController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!productService.exists(id))
             return ResponseEntity.notFound().build();
-        productService.delete(id);
-        return ResponseEntity.noContent().build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        boolean deleted = productService.deleteIfOwnerOrAdmin(id, usuario);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+    @GetMapping("/my-products")
+    public ResponseEntity<List<ProductDTO>> myProducts() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        Long userId = usuario.getId();
+        List<ProductDTO> list = productService.findByUserIdDto(userId);
+        return ResponseEntity.ok(list);
     }
 
 }

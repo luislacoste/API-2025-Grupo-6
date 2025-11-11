@@ -8,12 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.springbackend.dto.LoginRequestDTO;
 import com.example.springbackend.dto.RegisterRequestDTO;
+import com.example.springbackend.config.JwtUtil;
 import com.example.springbackend.dto.AuthResponseDTO;
 import com.example.springbackend.exception.EmailAlreadyExistsException;
 import com.example.springbackend.model.Role;
 import com.example.springbackend.model.Usuario;
 import com.example.springbackend.repository.UsuarioRepository;
-import com.example.springbackend.security.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 

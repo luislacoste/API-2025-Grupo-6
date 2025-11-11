@@ -103,6 +103,24 @@ export const fetchProductsByCategory = async (categoryName) => {
   }
 };
 
+// Función para obtener los productos del usuario autenticado
+export const fetchMyProducts = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/my-products`, {
+      headers: getAuthHeaders()
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al obtener los productos del usuario');
+    }
+
+    const products = await response.json();
+    return products;
+  } catch (error) {
+    throw new Error(`Error al cargar los productos del usuario: ${error.message}`);
+  }
+};
+
 // Función para crear un nuevo producto
 export const createProduct = async (productData) => {
   try {

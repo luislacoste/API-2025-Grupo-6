@@ -9,8 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import com.example.springbackend.model.Usuario;
 
 /**
  * Product Service
@@ -56,9 +57,6 @@ public class ProductService {
      */
     public ProductDTO create(ProductDTO productDto) {
         Product product = productMapper.toEntity(productDto);
-        if (product.getCreatedAt() == null) {
-            product.setCreatedAt(Instant.now());
-        }
         Product saved = productRepository.save(product);
         return productMapper.toDto(saved);
     }
@@ -94,6 +92,32 @@ public class ProductService {
     }
 
     /**
+     * Delete product if the requesting user is the owner or has ADMIN role
+     * @return true if deleted, false if not authorized or not found
+     */
+    public boolean deleteIfOwnerOrAdmin(Long id, Usuario usuario) {
+        Optional<Product> opt = productRepository.findById(id);
+        if (opt.isEmpty()) return false;
+        Product product = opt.get();
+
+        // Allow if admin
+        boolean isAdmin = usuario.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (isAdmin) {
+            productRepository.deleteById(id);
+            return true;
+        }
+
+        // Allow if owner
+        Long ownerId = product.getUserId();
+        if (ownerId != null && usuario.getId() != null && ownerId.equals(usuario.getId())) {
+            productRepository.deleteById(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Check if product exists
      */
     public boolean exists(Long id) {
@@ -105,5 +129,13 @@ public class ProductService {
      */
     public List<Product> findByUserId(Long userId) {
         return productRepository.findByUserId(userId);
+    }
+
+    /**
+     * Find products by user id and return as DTOs
+     */
+    public java.util.List<com.example.springbackend.dto.ProductDTO> findByUserIdDto(Long userId) {
+        java.util.List<Product> products = productRepository.findByUserId(userId);
+        return productMapper.toDtoList(products);
     }
 }

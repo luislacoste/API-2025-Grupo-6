@@ -13,8 +13,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 // JwtFilter will be declared as a bean in SecurityConfig to avoid circular dependencies
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.springbackend.security.JwtUtil;
-
 import java.io.IOException;
 
 /**

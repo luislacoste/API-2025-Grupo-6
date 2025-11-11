@@ -94,12 +94,13 @@ public class SecurityConfig {
                         // POST Products - Require authentication
                         .requestMatchers(HttpMethod.POST, "/products").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/products/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
+                        // Allow authenticated users to call DELETE on products; ownership/admin check is enforced in controller/service
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").authenticated()
                         
                         // Categories - Only ADMIN can modify
-                        .requestMatchers(HttpMethod.POST, "/categories").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/categories").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PUT, "/categories/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.DELETE, "/categories/**").hasAnyRole("ADMIN", "USER")
                         
                         // Orders - Require authentication
                         .requestMatchers(HttpMethod.POST, "/orders").authenticated()
@@ -107,7 +108,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/orders/**").hasAnyRole("ADMIN", "USER")
                         
                         // Admin specific routes
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "USER")
                         
                         // Any other route requires authentication by default
                         .anyRequest().authenticated())
@@ -120,7 +121,7 @@ public class SecurityConfig {
 
     // Declare JwtFilter as a bean here (constructed with JwtUtil and the userDetailsService)
     @Bean
-    public JwtFilter jwtFilter(com.example.springbackend.security.JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+    public JwtFilter jwtFilter(com.example.springbackend.config.JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         return new JwtFilter(jwtUtil, userDetailsService);
     }
 

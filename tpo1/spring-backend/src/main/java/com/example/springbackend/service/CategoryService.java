@@ -2,7 +2,6 @@ package com.example.springbackend.service;
 
 import com.example.springbackend.model.Category;
 import com.example.springbackend.dto.CategoryDTO;
-import com.example.springbackend.mapping.CategoryMapper;
 import com.example.springbackend.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,6 @@ import java.util.Optional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final CategoryMapper categoryMapper;
 
     // Entity helpers
     private List<Category> findAllEntities() {
@@ -40,25 +38,48 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
+    // Manual mapping helpers (avoid MapStruct generation issues)
+    private CategoryDTO toDto(Category c) {
+        if (c == null) return null;
+        return CategoryDTO.builder()
+                .id(c.getId())
+                .name(c.getName())
+                .description(c.getDescription())
+                .icon(c.getIcon())
+                .productCount(c.getProductCount())
+                .build();
+    }
+
+    private Category fromDto(CategoryDTO dto) {
+        if (dto == null) return null;
+        return Category.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .icon(dto.getIcon())
+                .productCount(dto.getProductCount())
+                .build();
+    }
+
     // Public DTO-aware API used by controllers
     public List<CategoryDTO> findAll() {
-        return categoryMapper.toDtoList(findAllEntities());
+        return findAllEntities().stream().map(this::toDto).toList();
     }
 
     public ResponseEntity<CategoryDTO> findById(Long id) {
         return findByIdEntity(id)
-                .map(cat -> ResponseEntity.ok(categoryMapper.toDto(cat)))
+                .map(cat -> ResponseEntity.ok(toDto(cat)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     public ResponseEntity<CategoryDTO> create(CategoryDTO dto) {
-        Category entity = categoryMapper.toEntity(dto);
+        Category entity = fromDto(dto);
         Category saved = saveEntity(entity);
-        return ResponseEntity.created(java.net.URI.create("/categories/" + saved.getId())).body(categoryMapper.toDto(saved));
+        return ResponseEntity.created(java.net.URI.create("/categories/" + saved.getId())).body(toDto(saved));
     }
 
     public ResponseEntity<CategoryDTO> update(Long id, CategoryDTO dto) {
-        Category details = categoryMapper.toEntity(dto);
+        Category details = fromDto(dto);
         return categoryRepository.findById(id)
                 .map(cat -> {
                     cat.setName(details.getName());
@@ -66,7 +87,7 @@ public class CategoryService {
                     cat.setIcon(details.getIcon());
                     cat.setProductCount(details.getProductCount());
                     Category saved = categoryRepository.save(cat);
-                    return ResponseEntity.ok(categoryMapper.toDto(saved));
+                    return ResponseEntity.ok(toDto(saved));
                 })
                 .orElseGet(() -> create(dto));
     }
