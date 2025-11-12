@@ -1,7 +1,9 @@
 // Archivo de servicios para hacer llamadas a la API con json-server
 // Siguiendo el estilo de fetcheo enseñado en clase
 
-const API_BASE_URL = 'http://localhost:3000';
+// Use environment variable in production, fallback to localhost for development
+// In Docker/production, nginx proxies requests, so we use relative URLs
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3000');
 
 // Helper to build headers including Authorization if token exists in localStorage
 // Resilient: looks for token under several keys in localStorage and falls back

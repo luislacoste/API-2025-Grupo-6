@@ -36,6 +36,18 @@ services:
     networks:
       - ecommerce-network
 
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecommerce-frontend
+    depends_on:
+      - spring-backend
+    ports:
+      - "8080:80"
+    networks:
+      - ecommerce-network
+
 volumes:
   mysql-data:
 

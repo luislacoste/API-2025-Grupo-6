@@ -2,7 +2,6 @@ package com.example.springbackend.service;
 
 import com.example.springbackend.model.Product;
 import com.example.springbackend.dto.ProductDTO;
-import com.example.springbackend.mapping.ProductMapper;
 import com.example.springbackend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import com.example.springbackend.model.Usuario;
 
 /**
@@ -25,14 +25,30 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    private final ProductMapper productMapper;
+    // Manual mapping helper (similar to CategoryService to avoid MapStruct issues)
+    private ProductDTO toDto(Product product) {
+        if (product == null) return null;
+        return ProductDTO.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .category(product.getCategory())
+                .description(product.getDescription())
+                .image(product.getImage())
+                .stock(product.getStock())
+                .createdAt(product.getCreatedAt())
+                .userId(product.getUserId())
+                .build();
+    }
 
     /**
      * Get all products
      */
     public List<ProductDTO> findAll() {
         List<Product> products = productRepository.findAll();
-        return productMapper.toDtoList(products);
+        return products.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -41,7 +57,7 @@ public class ProductService {
     public ProductDTO findById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        return productMapper.toDto(product);
+        return toDto(product);
     }
 
     /**
@@ -49,35 +65,51 @@ public class ProductService {
      */
     public List<ProductDTO> findByCategory(String category) {
         List<Product> products = productRepository.findByCategory(category);
-        return productMapper.toDtoList(products);
+        return products.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     /**
      * Create a new product
      */
     public ProductDTO create(ProductDTO productDto) {
-        Product product = productMapper.toEntity(productDto);
+        Product product = new Product();
+        product.setName(productDto.getName());
+        product.setPrice(productDto.getPrice());
+        product.setCategory(productDto.getCategory());
+        product.setDescription(productDto.getDescription());
+        product.setImage(productDto.getImage());
+        product.setStock(productDto.getStock());
+        product.setUserId(productDto.getUserId());
+        if (productDto.getCreatedAt() != null) {
+            product.setCreatedAt(productDto.getCreatedAt());
+        } else {
+            product.setCreatedAt(java.time.Instant.now());
+        }
         Product saved = productRepository.save(product);
-        return productMapper.toDto(saved);
+        return toDto(saved);
     }
 
     /**
      * Update an existing product
      */
     public ProductDTO update(Long id, ProductDTO productDto) {
-        Product product = productMapper.toEntity(productDto);
         Product savedProduct = productRepository.findById(id)
                 .map(existingProduct -> {
-                    existingProduct.setName(product.getName());
-                    existingProduct.setPrice(product.getPrice());
-                    existingProduct.setCategory(product.getCategory());
-                    existingProduct.setDescription(product.getDescription());
-                    existingProduct.setImage(product.getImage());
-                    existingProduct.setStock(product.getStock());
+                    existingProduct.setName(productDto.getName());
+                    existingProduct.setPrice(productDto.getPrice());
+                    existingProduct.setCategory(productDto.getCategory());
+                    existingProduct.setDescription(productDto.getDescription());
+                    existingProduct.setImage(productDto.getImage());
+                    existingProduct.setStock(productDto.getStock());
+                    if (productDto.getUserId() != null) {
+                        existingProduct.setUserId(productDto.getUserId());
+                    }
                     return productRepository.save(existingProduct);
                 }).orElse(null);
 
-        return savedProduct != null ? productMapper.toDto(savedProduct) : null;
+        return savedProduct != null ? toDto(savedProduct) : null;
     }
 
     /**
@@ -133,6 +165,8 @@ public class ProductService {
      */
     public java.util.List<com.example.springbackend.dto.ProductDTO> findByUserId(Long userId) {
         java.util.List<Product> products = productRepository.findByUserId(userId);
-        return productMapper.toDtoList(products);
+        return products.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 }
