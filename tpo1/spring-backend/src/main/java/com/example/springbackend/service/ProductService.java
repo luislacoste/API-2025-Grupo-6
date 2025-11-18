@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 import com.example.springbackend.model.Usuario;
+import java.util.stream.Collectors;
 
 /**
  * Product Service
@@ -29,9 +30,24 @@ public class ProductService {
      * Get all products
      */
     public List<ProductDTO> findAll() {
+        System.out.println(">>> PRODUCT MAPPER CLASS = " + productMapper.getClass().getName());
+        System.out.println(">>> MAPPER INSTANCE = " + productMapper);
+
         List<Product> products = productRepository.findAll();
-        System.out.println(productMapper.toDtoList(products));
-        return productMapper.toDtoList(products);
+        products.forEach(p -> {
+            System.out.println("ENTITY => id=" + p.getId() + ", name=" + p.getName() + ", price=" + p.getPrice());
+        });
+
+        // Test single mapping first
+        if (!products.isEmpty()) {
+            Product first = products.get(0);
+            ProductDTO testDto = productMapper.toDto(first);
+            System.out.println("SINGLE MAPPING TEST => " + testDto);
+        }
+
+        List<ProductDTO> dtos = productMapper.toDtoList(products);
+        System.out.println("MAPPED DTOs => " + dtos);
+        return dtos;
     }
 
     /**
@@ -92,11 +108,13 @@ public class ProductService {
 
     /**
      * Delete product if the requesting user is the owner or has ADMIN role
+     * 
      * @return true if deleted, false if not authorized or not found
      */
     public boolean deleteIfOwnerOrAdmin(Long id, Usuario usuario) {
         Optional<Product> opt = productRepository.findById(id);
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty())
+            return false;
         Product product = opt.get();
 
         // Allow if admin
@@ -133,5 +151,16 @@ public class ProductService {
     public java.util.List<com.example.springbackend.dto.ProductDTO> findByUserId(Long userId) {
         java.util.List<Product> products = productRepository.findByUserId(userId);
         return productMapper.toDtoList(products);
+    }
+
+    /**
+     * Manual mapping (no MapStruct) for diagnostic: builds DTOs by hand.
+     * Use this to verify whether mapping issues come from MapStruct or elsewhere.
+     */
+    public java.util.List<com.example.springbackend.dto.ProductDTO> findAllManual() {
+        java.util.List<Product> products = productRepository.findAll();
+        return products.stream().map(p -> new com.example.springbackend.dto.ProductDTO(
+                p.getId(), p.getName(), p.getPrice(), p.getCategory(), p.getDescription(), p.getImage(),
+                p.getStock(), p.getCreatedAt(), p.getUserId())).collect(Collectors.toList());
     }
 }

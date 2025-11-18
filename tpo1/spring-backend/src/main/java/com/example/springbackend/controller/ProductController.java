@@ -32,6 +32,14 @@ public class ProductController {
         return productService.findAll();
     }
 
+    @GetMapping("/manual")
+    /**
+     * Diagnostic endpoint: return DTOs produced by a manual mapper (no MapStruct).
+     */
+    public List<ProductDTO> allManual() {
+        return productService.findAllManual();
+    }
+
     @GetMapping("/{id}")
     /**
      * GET /products/{id}

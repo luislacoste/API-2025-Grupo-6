@@ -2,7 +2,6 @@ package com.example.springbackend.dto;
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +10,6 @@ import lombok.NoArgsConstructor;
  * Usamos Lombok para reducir el boilerplate (getters/setters/constructors/builder).
  */
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDTO {

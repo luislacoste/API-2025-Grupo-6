@@ -1,13 +1,31 @@
-# Build stage
+# Build stage - Using specific Java version
 FROM maven:3.9.6-eclipse-temurin-17 AS build
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean compile package -DskipTests
 
-# Run stage
-FROM eclipse-temurin:17-jdk-jammy
+# Set working directory
 WORKDIR /app
-COPY --from=build /app/target/spring-backend-0.0.1-SNAPSHOT.jar app.jar
+
+# Copiamos solo pom.xml para cachear dependencias
+COPY pom.xml .
+
+# Descargamos dependencias (se cachea mientras no cambie el pom)
+RUN mvn dependency:go-offline -B
+
+# Copiamos el código
+COPY src ./src
+
+# Build del jar
+RUN mvn clean package -DskipTests
+
+# ====== RUNTIME STAGE ======
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+# Copiamos el jar generado desde la stage anterior
+COPY --from=build /app/target/*.jar app.jar
+
+# Expone el puerto por si querés
 EXPOSE 3000
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Comando de inicio
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

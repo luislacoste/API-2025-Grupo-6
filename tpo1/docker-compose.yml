@@ -1,0 +1,60 @@
+services:
+    mysql:
+        image: mysql:8.0
+        container_name: ecommerce-mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: rootpass
+            MYSQL_DATABASE: ecommerce_db
+            MYSQL_USER: ecomuser
+            MYSQL_PASSWORD: ecompass
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql-data:/var/lib/mysql
+        networks:
+            - ecommerce-network
+        healthcheck:
+            test: ["CMD", "mysql", "-uroot", "-prootpass", "-e", "SELECT 1;"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 20s
+
+    spring-backend:
+        build:
+            context: ./spring-backend
+            dockerfile: Dockerfile
+        container_name: ecommerce-backend
+        depends_on:
+            mysql:
+                condition: service_healthy
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ecommerce_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+            SPRING_DATASOURCE_USERNAME: ecomuser
+            SPRING_DATASOURCE_PASSWORD: ecompass
+        ports:
+            - "3000:3000"
+        networks:
+            - ecommerce-network
+
+    frontend:
+        build:
+            context: ./font
+            dockerfile: Dockerfile
+        container_name: ecommerce-frontend
+        depends_on:
+            - spring-backend
+        environment:
+            # ensure Vite listens on container network interfaces
+            CHOKIDAR_USEPOLLING: "true"
+        ports:
+            - "5173:5173"
+        networks:
+            - ecommerce-network
+
+volumes:
+    mysql-data:
+
+networks:
+    ecommerce-network:
+        driver: bridge
