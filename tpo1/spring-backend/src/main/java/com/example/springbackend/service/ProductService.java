@@ -22,9 +22,7 @@ import com.example.springbackend.model.Usuario;
 @RequiredArgsConstructor
 public class ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
-
+    private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
     /**
@@ -32,6 +30,7 @@ public class ProductService {
      */
     public List<ProductDTO> findAll() {
         List<Product> products = productRepository.findAll();
+        System.out.println(productMapper.toDtoList(products));
         return productMapper.toDtoList(products);
     }
 
